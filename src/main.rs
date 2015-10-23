@@ -2,6 +2,7 @@ extern crate getopts;
 extern crate gar;
 
 use gar::models::archive::{Archive};
+use gar::config;
 
 use std::env;
 use getopts::Options;
@@ -13,6 +14,7 @@ fn main() {
         Err(e) => panic!(e),
     };
 
+    if opts.opt_present("show-paths") { cli::show_paths(); return }
     if opts.opt_present("v") { cli::version(); return }
     if opts.opt_present("h") { cli::help(); return }
     if opts.opt_present("f") {
@@ -31,12 +33,14 @@ fn make_opts() -> Options {
     options.optopt("f", "fetch", "FETCH", "fetch a particular archive");
     options.optflag("h", "help", "print this");
     options.optflag("v", "version", "show the version");
+    options.optflag("", "show-paths", "show the paths that the application uses");
 
     options
 }
 
 mod cli {
     use gar::models::archive::Archive;
+    use gar::config::*;
 
     pub fn version() -> () {
         println!("app version: {}", env!("CARGO_PKG_VERSION"));
@@ -84,5 +88,12 @@ mod cli {
         a.set_day(day.unwrap());
         a.set_hour(hour.unwrap());
         a.fetch();
+    }
+
+    /// Print the standard paths that the app uses.
+    pub fn show_paths() -> () {
+        println!("Base: {:?}", config_path());
+        println!("Data: {:?}", data_path());
+        println!("Conf: {:?}", config_file_path());
     }
 }
