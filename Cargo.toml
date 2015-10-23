@@ -1,0 +1,14 @@
+[package]
+authors = ["psyomn <lethaljellybean@gmail.com>"]
+name = "gar"
+version = "0.1.0"
+
+[[bin]]
+name = "gar"
+
+[dependencies]
+chrono = "0.2.16"
+flate2 = "0.2.9"
+getopts = "0.2.14"
+hyper = "0.6.15"
+regex = "0.1.41"
