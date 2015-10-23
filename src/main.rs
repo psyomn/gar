@@ -8,6 +8,8 @@ use std::env;
 use getopts::Options;
 
 fn main() {
+    config::init();
+
     let args: Vec<String> = env::args().collect();
     let opts = match make_opts().parse(&args[1..]) {
         Ok(v) => v,
@@ -16,7 +18,10 @@ fn main() {
 
     if opts.opt_present("show-paths") { cli::show_paths(); return }
     if opts.opt_present("v") { cli::version(); return }
-    if opts.opt_present("h") { cli::help(); return }
+    if opts.opt_present("h") {
+        cli::help(args[0].clone().as_ref(), make_opts());
+        return;
+    }
     if opts.opt_present("f") {
         let val: String = match opts.opt_str("f") {
             Some(v) => v,
@@ -41,13 +46,15 @@ fn make_opts() -> Options {
 mod cli {
     use gar::models::archive::Archive;
     use gar::config::*;
+    use getopts::Options;
 
     pub fn version() -> () {
         println!("app version: {}", env!("CARGO_PKG_VERSION"));
     }
 
-    pub fn help() -> () {
-        println!("Abandon all hope, ye who enter here.");
+    pub fn help(program: &str, opts: Options) -> () {
+        let brief = format!("{} [options]", program);
+        print!("{}", opts.usage(&brief));
     }
 
     /// Argument provided should be in the form dd-mm-YYYY
