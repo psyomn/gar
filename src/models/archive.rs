@@ -1,8 +1,13 @@
-use std::io::Read;
 use chrono::*;
 use hyper::Client;
 use hyper::client::{Response};
 use hyper::header::Connection;
+
+use std::path::PathBuf;
+use std::fs::File;
+use std::io::{Read, Write};
+
+use config;
 
 const GITHUT_ARCHIVE_URL: &'static str = "http://data.githubarchive.org/";
 
@@ -43,7 +48,7 @@ impl Archive {
 
     /// Fetch the information of a specific archive. This will return something in memory, and will
     /// not make a local copy.
-    pub fn fetch(&self) -> Vec<u8> {
+    pub fn fetch(&mut self) -> () {
         let url: String = format!("{}{}.json.gz",
             GITHUT_ARCHIVE_URL,
             Archive::make_date(self.date));
@@ -62,10 +67,30 @@ impl Archive {
             Err(e) => { println!("{}", e); panic!(e)},
             _ => {},
         }
-        data
+
+        self.data = data;
+
+        if config::caching_on() { self.store() }
     }
 
     pub fn store(&self) -> () {
+        let mut base: PathBuf = config::data_path();
+        let s: String = match base.clone().to_str() {
+            Some(v) => v.to_string(),
+            None => return,
+        };
+
+        base.push(self.name.clone());
+
+        let mut f: File = match File::create(base) {
+            Ok(v) => v,
+            Err(e) => {
+                println!("Problem opening caching file @ {:?}", s);
+                return;
+            },
+        };
+
+        f.write_all(&self.data).unwrap();
     }
 
     /// Calls fetch, but also caches the data for future use

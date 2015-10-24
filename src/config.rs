@@ -54,6 +54,29 @@ fn read_configuration_file() -> Table {
     toml::Parser::new(&s).parse().unwrap()
 }
 
+pub fn caching_on() -> bool {
+    let t: Table = read_configuration_file();
+    match t.get(&"config".to_string()) {
+        Some(v) => {
+            match v {
+                &toml::Value::Table(ref vv) => {
+                    match vv.get(&"caching".to_string()) {
+                        Some(s) => match s {
+                            &toml::Value::String(ref s) => {
+                                s == "yes"
+                            },
+                            _ => false,
+                        },
+                        None => false,
+                    }
+                },
+                _ => false,
+            }
+        },
+        None => false,
+    }
+}
+
 /// Default things to run each time we go through the main entry point.
 pub fn init() -> () {
     let cpath: PathBuf = config_path();
@@ -62,12 +85,12 @@ pub fn init() -> () {
 
     if !cpath.exists() {
         println!("Config file path created for the first time");
-        fs::create_dir_all(cpath.to_str().unwrap());
+        fs::create_dir_all(cpath.to_str().unwrap()).unwrap();
     }
 
     if !dpath.exists() {
         println!("Data path created for the first time");
-        fs::create_dir_all(dpath.to_str().unwrap());
+        fs::create_dir_all(dpath.to_str().unwrap()).unwrap();
     }
 
     if !config_file.exists() {
@@ -85,7 +108,7 @@ pub fn init() -> () {
         };
 
         println!("Writing configuration for the first time");
-        f.write_all(s.as_bytes());
+        f.write_all(s.as_bytes()).unwrap();
     }
 }
 
