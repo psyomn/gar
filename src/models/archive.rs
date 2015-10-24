@@ -18,6 +18,8 @@ impl Archive {
         }
     }
 
+    /// Fetch the information of a specific archive. This will return something in memory, and will
+    /// not make a local copy.
     pub fn fetch(&self) -> Vec<u8> {
         let url: String = format!("{}{}.json.gz",
             GITHUT_ARCHIVE_URL,
@@ -45,19 +47,23 @@ impl Archive {
         println!("TODO");
     }
 
+    /// Set the year of the archive we're interested in
     pub fn set_year(&mut self, year: i32) -> () {
         self.date = UTC.ymd(year, self.date.month(), self.date.day())
                        .and_hms(9, 0, 0);
     }
 
+    /// Set the month of the archive we're interested in
     pub fn set_month(&mut self, month: u32) -> () {
         self.date = UTC.ymd(self.date.year(), month, self.date.day()).and_hms(9, 0, 0);
     }
 
+    /// Set the day of the archive we're interested in
     pub fn set_day(&mut self, day: u32) -> () {
         self.date = UTC.ymd(self.date.year(), self.date.month(), day).and_hms(9, 0, 0);
     }
 
+    /// Set the hour of the archive we're interested in
     pub fn set_hour(&mut self, h: u32) -> () {
         self.date = UTC.ymd(self.date.year(), self.date.month(), self.date.day()).and_hms(h, 0, 0);
     }
