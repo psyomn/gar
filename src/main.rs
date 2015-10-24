@@ -16,6 +16,7 @@ fn main() {
     };
 
     if opts.opt_present("show-paths") { cli::show_paths(); return }
+    if opts.opt_present("ls-data") { cli::ls_data(); return }
     if opts.opt_present("v") { cli::version(); return }
     if opts.opt_present("h") {
         cli::help(args[0].clone().as_ref(), make_opts());
@@ -38,6 +39,7 @@ fn make_opts() -> Options {
     options.optflag("h", "help", "print this");
     options.optflag("v", "version", "show the version");
     options.optflag("", "show-paths", "show the paths that the application uses");
+    options.optflag("", "ls-data", "print the data files");
 
     options
 }
@@ -46,6 +48,9 @@ mod cli {
     use gar::models::archive::{Archive, ArchiveBuilder};
     use gar::config::*;
     use getopts::Options;
+
+    use std::fs;
+    use std::path::PathBuf;
 
     /// Print the current version of GAR
     pub fn version() -> () {
@@ -100,6 +105,34 @@ mod cli {
                 .finalize();
 
         a.fetch();
+    }
+
+    pub fn ls_data() -> () {
+        let dpath: PathBuf = data_path();
+        let paths = match fs::read_dir(dpath) {
+            Ok(ps) => ps,
+            Err(e) => panic!("Problem with data directory {}", e),
+        };
+
+        for p in paths {
+            /* p is Option<Result<DirEntry>> */
+            match p {
+                Ok(v) => {
+                    let datafile_path = v.path();
+                    match datafile_path.to_str() {
+                        Some(finv) => {
+                            let size = match v.metadata() {
+                                Ok(mv) => mv.len(),
+                                Err(..) => 0,
+                            };
+                            println!("    {} [{}]", finv, size)
+                        },
+                        None => continue,
+                    }
+                },
+                Err(..) => continue,
+            }
+        }
     }
 
     /// Print the standard paths that the app uses.
