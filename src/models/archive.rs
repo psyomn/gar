@@ -8,13 +8,15 @@ const GITHUT_ARCHIVE_URL: &'static str = "http://data.githubarchive.org/";
 
 pub struct Archive {
     date: DateTime<UTC>,
+    data: Vec<u8>,
 }
 
 impl Archive {
 
     pub fn new() -> Archive {
         Archive {
-            date: UTC::now()
+            date: UTC::now(),
+            data: vec![],
         }
     }
 
@@ -40,6 +42,9 @@ impl Archive {
             _ => {},
         }
         data
+    }
+
+    pub fn store(&self) -> () {
     }
 
     /// Calls fetch, but also caches the data for future use

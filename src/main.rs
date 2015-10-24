@@ -66,6 +66,7 @@ mod cli {
             return;
         }
 
+        #[inline]
         fn try_int_parse(s: Option<&str>) -> Option<u32> {
             match s {
                 Some(v) => match v.parse::<u32>() {
