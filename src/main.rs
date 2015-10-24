@@ -1,7 +1,6 @@
 extern crate getopts;
 extern crate gar;
 
-use gar::models::archive::{Archive};
 use gar::config;
 
 use std::env;
@@ -44,14 +43,16 @@ fn make_opts() -> Options {
 }
 
 mod cli {
-    use gar::models::archive::Archive;
+    use gar::models::archive::{Archive, ArchiveBuilder};
     use gar::config::*;
     use getopts::Options;
 
+    /// Print the current version of GAR
     pub fn version() -> () {
         println!("app version: {}", env!("CARGO_PKG_VERSION"));
     }
 
+    /// Print the options menu
     pub fn help(program: &str, opts: Options) -> () {
         let brief = format!("{} [options]", program);
         print!("{}", opts.usage(&brief));
@@ -90,11 +91,14 @@ mod cli {
             }
         }
 
-        let mut a: Archive = Archive::new();
-        a.set_year(year.unwrap() as i32);
-        a.set_month(month.unwrap());
-        a.set_day(day.unwrap());
-        a.set_hour(hour.unwrap());
+        let mut a: Archive =
+            ArchiveBuilder::new()
+                .year(year.unwrap() as i32)
+                .month(month.unwrap())
+                .day(day.unwrap())
+                .hour(hour.unwrap())
+                .finalize();
+
         a.fetch();
     }
 
