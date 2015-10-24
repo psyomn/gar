@@ -77,6 +77,12 @@ pub fn caching_on() -> bool {
     }
 }
 
+pub fn data_exists(filename: &String) -> bool {
+    let mut dpath: PathBuf = data_path();
+    dpath.push(filename);
+    dpath.exists()
+}
+
 /// Default things to run each time we go through the main entry point.
 pub fn init() -> () {
     let cpath: PathBuf = config_path();

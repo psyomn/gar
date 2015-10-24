@@ -5,6 +5,7 @@ version = "0.1.0"
 
 [[bin]]
 name = "gar"
+doc = false
 
 [dependencies]
 chrono = "0.2.16"

@@ -49,10 +49,14 @@ impl Archive {
     /// Fetch the information of a specific archive. This will return something in memory, and will
     /// not make a local copy.
     pub fn fetch(&mut self) -> () {
-        let url: String = format!("{}{}.json.gz",
-            GITHUT_ARCHIVE_URL,
-            Archive::make_date(self.date));
+        let title: String = Archive::make_title(self.date);
 
+        if config::data_exists(&title) {
+            println!("Data {} exists in cache - skip", title);
+            return;
+        }
+
+        let url: String = format!("{}{}", GITHUT_ARCHIVE_URL, title);
         let url_ref: &str = url.as_ref();
 
         let client: Client = Client::new();
