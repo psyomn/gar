@@ -74,6 +74,11 @@ impl Archive {
 
         self.data = data;
 
+        if &self.data[0..5] == b"<?xml" {
+            println!("No such info found on server ({})", url);
+            return;
+        }
+
         if config::caching_on() { self.store() }
     }
 
@@ -90,6 +95,7 @@ impl Archive {
             Ok(v) => v,
             Err(e) => {
                 println!("Problem opening caching file @ {:?}", s);
+                println!("{}", e);
                 return;
             },
         };
