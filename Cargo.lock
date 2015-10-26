@@ -9,6 +9,7 @@ dependencies = [
  "regex 0.1.41 (registry+https://github.com/rust-lang/crates.io-index)",
  "term 0.2.12 (registry+https://github.com/rust-lang/crates.io-index)",
  "toml 0.1.23 (registry+https://github.com/rust-lang/crates.io-index)",
+ "walkdir 0.1.3 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -328,6 +329,14 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "matches 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "rustc-serialize 0.3.16 (registry+https://github.com/rust-lang/crates.io-index)",
+]
+
+[[package]]
+name = "walkdir"
+version = "0.1.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+dependencies = [
+ "libc 0.1.10 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
