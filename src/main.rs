@@ -1,7 +1,9 @@
+extern crate walkdir;
 extern crate getopts;
 extern crate gar;
 
 use gar::config;
+use gar::models::reader::{lines_of};
 
 use std::env;
 use getopts::Options;
@@ -153,6 +155,18 @@ mod cli {
     }
 
     pub fn find(vals: String) -> () {
-        println!("Find code goes here");
+        use std::fs::File;
+        use walkdir::WalkDir;
+        let p: PathBuf = data_path();
+        let start = WalkDir::new(p);
+
+        for entry in start.into_iter().filter_map(|e| e.ok()) {
+            let eisf = File::open(entry.path()).ok().unwrap()
+                .metadata().ok().unwrap().file_type().is_file();
+
+            if eisf {
+                println!("{}", entry.path().to_str().unwrap());
+            }
+        }
     }
 }
