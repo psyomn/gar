@@ -30,12 +30,22 @@ fn main() {
         cli::fetch(val);
         return;
     }
+    if opts.opt_present("find") {
+        match opts.opt_str("find") {
+            Some(v) => {
+                cli::find(v);
+                return;
+            }
+            None => panic!("You need to provide argument(s) in the form of <feature>:<value>,+"),
+        }
+    }
 }
 
 fn make_opts() -> Options {
     let mut options: Options = Options::new();
 
     options.optopt("f", "fetch", "FETCH", "fetch a particular archive");
+    options.optopt("", "find", "FEATURE", "feature to look for.");
     options.optflag("h", "help", "print this");
     options.optflag("v", "version", "show the version");
     options.optflag("", "show-paths", "show the paths that the application uses");
@@ -140,5 +150,9 @@ mod cli {
         println!("Base: {:?}", config_path());
         println!("Data: {:?}", data_path());
         println!("Conf: {:?}", config_file_path());
+    }
+
+    pub fn find(vals: String) -> () {
+        println!("Find code goes here");
     }
 }
