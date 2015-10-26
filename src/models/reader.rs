@@ -1,3 +1,4 @@
+use regex::Regex;
 use std::io::Read;
 use std::path::PathBuf;
 use std::fs::File;
@@ -22,7 +23,21 @@ pub fn deflate_to_contents(p: PathBuf) -> Option<String> {
 
 /// Each line in the data file corresponds into an entry
 pub fn lines_of(p: PathBuf) -> Vec<String> {
-    let v: Vec<String> = Vec::new();
+    let mut v: Vec<String> = Vec::new();
+    let data: String = match deflate_to_contents(p) {
+        Some(v) => v,
+        None => "".into(),
+    };
+
+    let re: Regex = Regex::new(r"^(.*)$").unwrap();
+
+    for line in re.captures(data.as_ref()) {
+        match line.at(0) {
+            Some(ln) => v.push(ln.into()),
+            None => continue,
+        }
+    }
+
     v
 }
 
