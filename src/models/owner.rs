@@ -12,6 +12,18 @@ impl Owner {
             email: "default@default".into(),
         }
     }
+
+    pub fn set_gh_id(&mut self, id: u64) -> () {
+        self.gh_id = id;
+    }
+
+    pub fn set_nick(&mut self, n: String) -> () {
+        self.nick = n;
+    }
+
+    pub fn set_email(&mut self, e: String) -> () {
+        self.email = e;
+    }
 }
 
 pub struct OwnerBuilder {

@@ -9,6 +9,7 @@ pub struct Repo {
     url: String,
 }
 
+/// Models a repo event, in the file obtained from githubarchive.
 impl Repo {
     pub fn new() -> Repo {
         Repo {
@@ -19,6 +20,18 @@ impl Repo {
             owner: owner::OwnerBuilder::new().finalize(),
             url: "default".into(),
         }
+    }
+
+    pub fn set_owner_gh_id(&mut self, id: u64) -> () {
+        self.owner.set_gh_id(id);
+    }
+
+    pub fn set_owner_nick(&mut self, n: String) -> () {
+        self.owner.set_nick(n);
+    }
+
+    pub fn set_owner_email(&mut self, e: String) -> () {
+        self.owner.set_email(e);
     }
 }
 
