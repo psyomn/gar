@@ -157,8 +157,11 @@ mod cli {
     pub fn find(vals: String) -> () {
         use std::fs::File;
         use walkdir::WalkDir;
+        use gar::models::reader::*;
+
         let p: PathBuf = data_path();
         let start = WalkDir::new(p);
+        let mut v: Vec<String> = Vec::new();
 
         for entry in start.into_iter().filter_map(|e| e.ok()) {
             let eisf = File::open(entry.path()).ok().unwrap()
@@ -166,7 +169,19 @@ mod cli {
 
             if eisf {
                 println!("{}", entry.path().to_str().unwrap());
+                let file_path: String = entry.path().to_str().unwrap().to_string();
+                v.push(file_path);
             }
+        }
+
+        match v.pop() {
+            Some(v) => {
+                println!("trying: {}", v);
+                for l in lines_of(PathBuf::from(v)) {
+                    println!("{}", l);
+                }
+            },
+            None => println!("nothing to do"),
         }
     }
 }

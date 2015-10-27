@@ -11,33 +11,28 @@ pub fn deflate_to_contents(p: PathBuf) -> Option<String> {
         Err(..) => return None,
     };
 
-    let mut s: String = String::new();
-    f.read_to_string(&mut s).unwrap();
-    let mut d = GzDecoder::new(s.as_bytes()).unwrap();
-    let mut res: String = String::new();
+    let mut bytes: Vec<u8> = Vec::new();
 
-    d.read_to_string(&mut res).unwrap();
+    f.read_to_end(&mut bytes).unwrap();
 
-    Some(res)
+    let bb: &[u8] = bytes.as_ref();
+    let mut d = GzDecoder::new(bb).unwrap();
+    let mut decomp: String = String::new();
+
+    let bytecount = d.read_to_string(&mut decomp).unwrap();
+
+    Some(decomp)
 }
 
 /// Each line in the data file corresponds into an entry
 pub fn lines_of(p: PathBuf) -> Vec<String> {
-    let mut v: Vec<String> = Vec::new();
     let data: String = match deflate_to_contents(p) {
         Some(v) => v,
         None => "".into(),
     };
 
-    let re: Regex = Regex::new(r"^(.*)$").unwrap();
-
-    for line in re.captures(data.as_ref()) {
-        match line.at(0) {
-            Some(ln) => v.push(ln.into()),
-            None => continue,
-        }
-    }
-
-    v
+    data.lines()
+        .map(|e| e.to_string())
+        .collect()
 }
 
