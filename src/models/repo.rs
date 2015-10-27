@@ -1,6 +1,7 @@
 use rustc_serialize::json::Json;
 use models::owner;
 
+#[derive(Debug)]
 pub enum Event {
     CreateEvent,
     ForkEvent,
@@ -19,7 +20,7 @@ pub struct Repo {
     watchers: u64,
     stargazers: u64,
     forks: u64,
-    event_type: Event,
+    event_type: Option<Event>,
 }
 
 /// Models a repo event, in the file obtained from githubarchive.
@@ -36,6 +37,7 @@ impl Repo {
             watchers: 0,
             stargazers: 0,
             forks: 0,
+            event_type: None,
         }
     }
 
@@ -49,6 +51,10 @@ impl Repo {
 
     pub fn set_forks(&mut self, f: u64) -> () {
         self.forks = f;
+    }
+
+    pub fn set_event_type(&mut self, e: Option<Event>) -> () {
+        self.event_type = e;
     }
 
     pub fn set_description(&mut self, s: String) -> () {
@@ -105,6 +111,21 @@ impl Repo {
         let repo = match obj.get("repository") {
             None => return None,
             Some(v) => v.as_object().unwrap(),
+        };
+
+        let event: Option<Event> = match obj.get("type") {
+            None => None,
+            Some(v) => match *v {
+                Json::String(ref s) => {
+                    let st: &str = s.as_ref();
+                    match st {
+                        "CreateEvent" => Some(Event::CreateEvent),
+                        "ForkEvent" => Some(Event::ForkEvent),
+                        _ => Some(Event::Other)
+                    }
+                },
+                _ => None,
+            },
         };
 
         let gh_id = match repo.get("id") {
@@ -180,6 +201,7 @@ impl Repo {
         repo.set_name(name);
         repo.set_has_issues(issues_present);
         repo.set_language(language);
+        repo.set_event_type(event);
 
         Some(repo)
     }
