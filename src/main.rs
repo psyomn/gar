@@ -3,7 +3,6 @@ extern crate getopts;
 extern crate gar;
 
 use gar::config;
-use gar::models::reader::{lines_of};
 
 use std::env;
 use getopts::Options;
