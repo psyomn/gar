@@ -1,0 +1,134 @@
+use models::archive::{Archive, ArchiveBuilder};
+use config::*;
+
+use std::fs;
+use std::path::PathBuf;
+
+use models::reader::*;
+use models::repo::Repo;
+
+/// Print the current version of GAR
+pub fn version() -> () {
+    println!("app version: {}", env!("CARGO_PKG_VERSION"));
+}
+
+/// Same as fetch, but we're fetching a date range
+pub fn fetch_rng(from: Option<String>, to: Option<String>) -> () {
+
+}
+
+/// Argument provided should be in the form dd-mm-YYYY
+pub fn fetch(s: String) -> () {
+    let vals: Vec<&str> = s.split("-").collect::<Vec<&str>>();
+
+    if vals.len() < 4 {
+        println!("You need to provide a date in the format of dd-mm-yyyy");
+        return;
+    }
+
+    #[inline]
+    fn try_int_parse(s: Option<&str>) -> Option<u32> {
+        match s {
+            Some(v) => match v.parse::<u32>() {
+                Ok(iv) => Some(iv),
+                Err(..) => None,
+            },
+            None => None,
+        }
+    }
+
+    let mut it = vals.into_iter();
+    let year  = try_int_parse(it.next());
+    let month = try_int_parse(it.next());
+    let day   = try_int_parse(it.next());
+    let hour  = try_int_parse(it.next());
+
+    for x in vec![year, month, day, hour].iter() {
+        match *x {
+            None => return,
+            _    => {},
+        }
+    }
+
+    let mut a: Archive =
+        ArchiveBuilder::new()
+            .year(year.unwrap() as i32)
+            .month(month.unwrap())
+            .day(day.unwrap())
+            .hour(hour.unwrap())
+            .finalize();
+
+    a.fetch();
+}
+
+pub fn ls_data() -> () {
+    let dpath: PathBuf = data_path();
+    let paths = match fs::read_dir(dpath) {
+        Ok(ps) => ps,
+        Err(e) => panic!("Problem with data directory {}", e),
+    };
+
+    for p in paths {
+        /* p is Option<Result<DirEntry>> */
+        match p {
+            Ok(v) => {
+                let datafile_path = v.path();
+                match datafile_path.to_str() {
+                    Some(finv) => {
+                        let size = match v.metadata() {
+                            Ok(mv) => mv.len(),
+                            Err(..) => 0,
+                        };
+                        println!("    {} [{}]", finv, size)
+                    },
+                    None => continue,
+                }
+            },
+            Err(..) => continue,
+        }
+    }
+}
+
+/// Print the standard paths that the app uses.
+pub fn show_paths() -> () {
+    println!("Base: {:?}", config_path());
+    println!("Data: {:?}", data_path());
+    println!("Conf: {:?}", config_file_path());
+}
+
+pub fn find(vals: String) -> () {
+    use std::fs::File;
+    use walkdir::WalkDir;
+
+    let p: PathBuf = data_path();
+    let start = WalkDir::new(p);
+    let mut v: Vec<String> = Vec::new();
+
+    for entry in start.into_iter().filter_map(|e| e.ok()) {
+        let eisf = File::open(entry.path()).ok().unwrap()
+            .metadata().ok().unwrap().file_type().is_file();
+
+        if eisf {
+            println!("{}", entry.path().to_str().unwrap());
+            let file_path: String = entry.path().to_str().unwrap().to_string();
+            v.push(file_path);
+        }
+    }
+
+    match v.pop() {
+        Some(v) => {
+            let first_line = lines_of(PathBuf::from(v)).iter().nth(0).unwrap().clone();
+            println!("supplying {}", first_line);
+            let repo = Repo::from_json(first_line);
+            match repo {
+                Some(v) => {
+                    println!("{:#?}", v);
+                },
+                None => {
+                    println!("Won't print anything");
+                }
+            }
+        },
+        None => println!("nothing to do"),
+    }
+}
