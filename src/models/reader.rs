@@ -1,4 +1,3 @@
-use regex::Regex;
 use std::io::Read;
 use std::path::PathBuf;
 use std::fs::File;
