@@ -33,6 +33,13 @@ impl Repo {
     pub fn set_owner_email(&mut self, e: String) -> () {
         self.owner.set_email(e);
     }
+
+    /// Given a json string, try to evaluate it into a repo
+    pub fn from_json(data: String) -> Option<Repo> {
+        let data = Json::from_str(data.as_ref());
+
+        None
+    }
 }
 
 pub struct RepoBuilder {
@@ -43,6 +50,19 @@ impl RepoBuilder {
     pub fn new() -> RepoBuilder {
         RepoBuilder {
             repo: Repo::new(),
+        }
+    }
+}
+
+
+mod test {
+    use super::*;
+    #[test]
+    fn test_json_parse_simple() -> () {
+        let r: Option<Repo> = Repo::from_json("{\"name\":\"potato\"".into());
+        match r {
+            None => assert!(true),
+            _ => assert!(false),
         }
     }
 }
