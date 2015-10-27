@@ -5,6 +5,7 @@ use models::owner;
 pub struct Repo {
     gh_id: u64,
     name: String,
+    description: String,
     language: String,
     has_issues: bool,
     owner: owner::Owner,
@@ -18,10 +19,35 @@ impl Repo {
             gh_id: 0,
             name: "default".into(),
             language: "default".into(),
+            description: "default".into(),
             has_issues: false,
             owner: owner::OwnerBuilder::new().finalize(),
             url: "default".into(),
         }
+    }
+
+    pub fn set_description(&mut self, s: String) -> () {
+        self.description = s;
+    }
+
+    pub fn set_gh_id(&mut self, id: u64) -> () {
+        self.gh_id = id;
+    }
+
+    pub fn set_name(&mut self, s: String) -> () {
+        self.name = s;
+    }
+
+    pub fn set_language(&mut self, l: String) -> () {
+        self.language = l;
+    }
+
+    pub fn set_has_issues(&mut self, b: bool) -> () {
+        self.has_issues = b;
+    }
+
+    pub fn set_url(&mut self, s: String) -> () {
+        self.url = s;
     }
 
     pub fn set_owner_gh_id(&mut self, id: u64) -> () {
@@ -47,12 +73,9 @@ impl Repo {
             },
         };
 
-        println!("{:?}", dt);
-
         if !dt.is_object() { return None }
 
-        let rb: RepoBuilder = RepoBuilder::new();
-        let obj = dt.as_object().unwrap_or(return None);
+        let obj = dt.as_object().unwrap();
 
         let repo = match obj.get("repository") {
             None => return None,
@@ -64,26 +87,54 @@ impl Repo {
                 Json::U64(id) => id,
                 _ => 0,
             },
-            _ => 0
+            None => 0
         };
+
+        let name: String = match repo.get("name") {
+            Some(v) => match *v {
+                Json::String(ref s) => s.clone(),
+                _ => "".into(),
+            },
+            None => "".into(),
+        };
+
+        let url: String = match repo.get("url") {
+            Some(v) => match *v {
+                Json::String(ref s) => s.clone(),
+                _ => "".into(),
+            },
+            None => "".into(),
+        };
+
+        let desc: String = match repo.get("description") {
+            Some(v) => match *v {
+                Json::String(ref s) => s.clone(),
+                _ => "".into(),
+            },
+            None => "".into(),
+        };
+
+        let owner_name: String = match repo.get("owner") {
+            Some(v) => match *v {
+                Json::String(ref s) => s.clone(),
+                _ => "".into(),
+            },
+            None => "".into(),
+        };
+
         println!("read id: {}", gh_id);
 
-        Some(Repo::new())
+        let mut repo: Repo = Repo::new();
+
+        repo.set_gh_id(gh_id);
+        repo.set_url(url);
+        repo.set_owner_nick(owner_name);
+        repo.set_description(desc);
+        repo.set_name(name);
+
+        Some(repo)
     }
 }
-
-pub struct RepoBuilder {
-    repo: Repo,
-}
-
-impl RepoBuilder {
-    pub fn new() -> RepoBuilder {
-        RepoBuilder {
-            repo: Repo::new(),
-        }
-    }
-}
-
 
 mod test {
     use super::*;
