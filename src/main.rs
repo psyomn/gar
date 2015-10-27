@@ -28,6 +28,13 @@ fn main() {
             Some(v) => v,
             None => panic!("You need to supply a date for fetch"),
         };
+        if opts.opt_present("from") == opts.opt_present("to") {
+        }
+        else {
+            println!("Currently, you need to specify both from, and to dates, if\
+            you choose to supply dates!");
+            return;
+        }
         cli::fetch(val);
         return;
     }
@@ -51,6 +58,8 @@ fn make_opts() -> Options {
     options.optflag("v", "version", "show the version");
     options.optflag("", "show-paths", "show the paths that the application uses");
     options.optflag("", "ls-data", "print the data files");
+    options.optopt("", "from", "FROM", "specify date from (use with fetch)");
+    options.optopt("", "to", "TO", "specify date to (use with fetch)");
 
     options
 }
