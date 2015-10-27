@@ -1,3 +1,5 @@
+use chrono::*;
+
 use models::archive::{Archive, ArchiveBuilder};
 use config::*;
 
@@ -12,18 +14,12 @@ pub fn version() -> () {
     println!("app version: {}", env!("CARGO_PKG_VERSION"));
 }
 
-/// Same as fetch, but we're fetching a date range
-pub fn fetch_rng(from: Option<String>, to: Option<String>) -> () {
-
-}
-
-/// Argument provided should be in the form dd-mm-YYYY
-pub fn fetch(s: String) -> () {
-    let vals: Vec<&str> = s.split("-").collect::<Vec<&str>>();
+fn parse_archive_date(date: String) -> Option<DateTime<UTC>> {
+    let vals: Vec<&str> = date.split("-").collect::<Vec<&str>>();
 
     if vals.len() < 4 {
-        println!("You need to provide a date in the format of dd-mm-yyyy");
-        return;
+        println!("Error {:?}: You need to provide a date in the format of dd-mm-yyyy", date);
+        return None;
     }
 
     #[inline]
@@ -38,27 +34,75 @@ pub fn fetch(s: String) -> () {
     }
 
     let mut it = vals.into_iter();
-    let year  = try_int_parse(it.next());
-    let month = try_int_parse(it.next());
-    let day   = try_int_parse(it.next());
-    let hour  = try_int_parse(it.next());
 
-    for x in vec![year, month, day, hour].iter() {
-        match *x {
-            None => return,
-            _    => {},
-        }
-    }
+    Some(UTC.ymd(
+        try_int_parse(it.next()).unwrap() as i32,
+        try_int_parse(it.next()).unwrap(),
+        try_int_parse(it.next()).unwrap())
+       .and_hms(
+        try_int_parse(it.next()).unwrap(),
+        0, 0))
+}
+
+fn parse_archive(date: String) -> Option<Archive> {
+    let date = parse_archive_date(date).unwrap();
+
+    let year  = date.year();
+    let month = date.month();
+    let day   = date.day();
+    let hour  = date.hour();
 
     let mut a: Archive =
         ArchiveBuilder::new()
-            .year(year.unwrap() as i32)
-            .month(month.unwrap())
-            .day(day.unwrap())
-            .hour(hour.unwrap())
+            .year(year)
+            .month(month)
+            .day(day)
+            .hour(hour)
             .finalize();
+    Some(a)
+}
 
-    a.fetch();
+/// Same as fetch, but we're fetching a date range
+pub fn fetch_rng(from: Option<String>, to: Option<String>) -> () {
+    use time::Duration;
+
+    fn match_and_parse(o: Option<String>) -> Option<DateTime<UTC>> {
+        match o {
+            Some(v) => parse_archive_date(v),
+            None => return None,
+        }
+    }
+
+    let fr = match_and_parse(from);
+    let to = match_and_parse(to);
+
+    if fr.is_none() || to.is_none() {
+        println!("You need to supply both from, and to option flags");
+    }
+
+    let fr_v = fr.unwrap();
+    let to_v = to.unwrap();
+
+    if fr_v > to_v {
+        println!("You need to supply valid date ranges");
+        println!("From is after To in this case");
+    }
+
+
+    println!("Before duration, fr_v is: {}", fr_v);
+    let d = Duration::minutes(60);
+    let tmp = fr_v + d;
+    println!("After duration, fr_v is: {}", tmp);
+
+}
+
+/// Argument provided should be in the form dd-mm-YYYY
+pub fn fetch(s: String) -> () {
+    let mut archive = match parse_archive(s) {
+        Some(a) => a,
+        None => panic!("Could not fetch archive"),
+    };
+    archive.fetch();
 }
 
 pub fn ls_data() -> () {

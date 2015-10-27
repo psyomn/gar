@@ -26,28 +26,18 @@ fn main() {
     }
     if opts.opt_present("f") {
         /* gar --fetch */
-        if opts.opt_present("from") == opts.opt_present("to") {
-            match opts.opt_present("from") || opts.opt_present("to") {
-                true => {
-                    /* gar --fetch --from X --to Y */
-                    cli::fetch_rng(opts.opt_str("from"),
-                                   opts.opt_str("to"));
-                },
-                false =>  {
-                    let val: String = match opts.opt_str("f") {
-                        Some(v) => v,
-                        None => panic!("You need to supply a date for fetch"),
-                    };
-                    cli::fetch(val);
-                },
-            }
-        }
-        else {
-            println!("Currently, you need to specify both from, and to dates, if\
-            you choose to supply dates!");
-        }
+        let val: String = match opts.opt_str("f") {
+            Some(v) => v,
+            None => panic!("You need to supply a date for fetch"),
+        };
+        cli::fetch(val);
         return;
     }
+
+    if opts.opt_present("fetch-rng") {
+      cli::fetch_rng(opts.opt_str("from"), opts.opt_str("to"));
+    }
+
     if opts.opt_present("find") {
         match opts.opt_str("find") {
             Some(v) => {
