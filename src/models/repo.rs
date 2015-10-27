@@ -122,6 +122,14 @@ impl Repo {
             None => "".into(),
         };
 
+        let issues_present: bool = match repo.get("has_issues") {
+            Some(v) => match *v {
+                Json::Boolean(b) => b,
+                _ => false,
+            },
+            None => false,
+        };
+
         println!("read id: {}", gh_id);
 
         let mut repo: Repo = Repo::new();
@@ -131,6 +139,7 @@ impl Repo {
         repo.set_owner_nick(owner_name);
         repo.set_description(desc);
         repo.set_name(name);
+        repo.set_has_issues(issues_present);
 
         Some(repo)
     }
