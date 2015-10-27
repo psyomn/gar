@@ -38,12 +38,21 @@ impl Repo {
 
     /// Given a json string, try to evaluate it into a repo
     pub fn from_json(data: String) -> Option<Repo> {
-        let data = Json::from_str(data.as_ref()).unwrap_or(return None);
+        let dt = match Json::from_str(data.as_ref()) {
+            Ok(v) => v,
+            Err(e) => {
+                println!("Could not parse anything given:\n{}", data);
+                println!("Err: {}", e);
+                return None;
+            },
+        };
 
-        if !data.is_object() { return None }
+        println!("{:?}", dt);
+
+        if !dt.is_object() { return None }
 
         let rb: RepoBuilder = RepoBuilder::new();
-        let obj = data.as_object().unwrap_or(return None);
+        let obj = dt.as_object().unwrap_or(return None);
 
         let repo = match obj.get("repository") {
             None => return None,

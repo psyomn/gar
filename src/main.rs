@@ -178,8 +178,8 @@ mod cli {
         match v.pop() {
             Some(v) => {
                 let first_line = lines_of(PathBuf::from(v)).iter().nth(0).unwrap().clone();
-                let repo = Repo::from_json(first_line);
                 println!("supplying {}", first_line);
+                let repo = Repo::from_json(first_line);
                 match repo {
                     Some(v) => {
                         println!("{:?}", v);
