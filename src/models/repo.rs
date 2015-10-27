@@ -1,5 +1,7 @@
+use rustc_serialize::json::Json;
 use models::owner;
 
+#[derive(Debug)]
 pub struct Repo {
     gh_id: u64,
     name: String,
@@ -36,9 +38,28 @@ impl Repo {
 
     /// Given a json string, try to evaluate it into a repo
     pub fn from_json(data: String) -> Option<Repo> {
-        let data = Json::from_str(data.as_ref());
+        let data = Json::from_str(data.as_ref()).unwrap_or(return None);
 
-        None
+        if !data.is_object() { return None }
+
+        let rb: RepoBuilder = RepoBuilder::new();
+        let obj = data.as_object().unwrap_or(return None);
+
+        let repo = match obj.get("repository") {
+            None => return None,
+            Some(v) => v.as_object().unwrap(),
+        };
+
+        let gh_id = match repo.get("id") {
+            Some(v) => match *v {
+                Json::U64(id) => id,
+                _ => 0,
+            },
+            _ => 0
+        };
+        println!("read id: {}", gh_id);
+
+        Some(Repo::new())
     }
 }
 

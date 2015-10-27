@@ -158,6 +158,7 @@ mod cli {
         use std::fs::File;
         use walkdir::WalkDir;
         use gar::models::reader::*;
+        use gar::models::repo::Repo;
 
         let p: PathBuf = data_path();
         let start = WalkDir::new(p);
@@ -176,9 +177,16 @@ mod cli {
 
         match v.pop() {
             Some(v) => {
-                println!("trying: {}", v);
-                for l in lines_of(PathBuf::from(v)) {
-                    println!("{}", l);
+                let first_line = lines_of(PathBuf::from(v)).iter().nth(0).unwrap().clone();
+                let repo = Repo::from_json(first_line);
+                println!("supplying {}", first_line);
+                match repo {
+                    Some(v) => {
+                        println!("{:?}", v);
+                    },
+                    None => {
+                        println!("Won't print anything");
+                    }
                 }
             },
             None => println!("nothing to do"),

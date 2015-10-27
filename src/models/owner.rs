@@ -1,3 +1,4 @@
+#[derive(Debug)]
 pub struct Owner {
     gh_id: u64,
     nick: String,
