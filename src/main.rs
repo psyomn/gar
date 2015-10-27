@@ -26,11 +26,10 @@ fn main() {
     }
     if opts.opt_present("f") {
         /* gar --fetch */
-        let val: String = match opts.opt_str("f") {
-            Some(v) => v,
+        match opts.opt_str("f") {
+            Some(v) => cli::fetch(v),
             None => panic!("You need to supply a date for fetch"),
-        };
-        cli::fetch(val);
+        }
         return;
     }
 
