@@ -1,6 +1,12 @@
 use rustc_serialize::json::Json;
 use models::owner;
 
+pub enum Event {
+    CreateEvent,
+    ForkEvent,
+    Other,
+}
+
 #[derive(Debug)]
 pub struct Repo {
     gh_id: u64,
@@ -10,6 +16,10 @@ pub struct Repo {
     has_issues: bool,
     owner: owner::Owner,
     url: String,
+    watchers: u64,
+    stargazers: u64,
+    forks: u64,
+    event_type: Event,
 }
 
 /// Models a repo event, in the file obtained from githubarchive.
@@ -23,7 +33,22 @@ impl Repo {
             has_issues: false,
             owner: owner::OwnerBuilder::new().finalize(),
             url: "default".into(),
+            watchers: 0,
+            stargazers: 0,
+            forks: 0,
         }
+    }
+
+    pub fn set_watchers(&mut self, w: u64) -> () {
+        self.watchers = w;
+    }
+
+    pub fn set_stargazers(&mut self, s: u64) -> () {
+        self.stargazers = s;
+    }
+
+    pub fn set_forks(&mut self, f: u64) -> () {
+        self.forks = f;
     }
 
     pub fn set_description(&mut self, s: String) -> () {
@@ -136,6 +161,14 @@ impl Repo {
                 _ => "".into(),
             },
             None => "".into(),
+        };
+
+        let num_stargazers: u64 = match repo.get("stargazers") {
+            Some(v) => match *v {
+                Json::U64(num) => num,
+                _ => 0,
+            },
+            None => 0,
         };
 
         let mut repo: Repo = Repo::new();
