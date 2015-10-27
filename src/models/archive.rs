@@ -11,6 +11,8 @@ use config;
 
 const GITHUT_ARCHIVE_URL: &'static str = "http://data.githubarchive.org/";
 
+/// An archive is a file object - not to be confused with repos, or things that will give us access
+/// to data.
 #[derive(Debug)]
 pub struct Archive {
     date: DateTime<UTC>,
