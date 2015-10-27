@@ -181,7 +181,7 @@ mod cli {
                 let repo = Repo::from_json(first_line);
                 match repo {
                     Some(v) => {
-                        println!("{:?}", v);
+                        println!("{:#?}", v);
                     },
                     None => {
                         println!("Won't print anything");

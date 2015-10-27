@@ -130,7 +130,13 @@ impl Repo {
             None => false,
         };
 
-        println!("read id: {}", gh_id);
+        let language: String = match repo.get("language") {
+            Some(v) => match *v {
+                Json::String(ref s) => s.clone(),
+                _ => "".into(),
+            },
+            None => "".into(),
+        };
 
         let mut repo: Repo = Repo::new();
 
@@ -140,6 +146,7 @@ impl Repo {
         repo.set_description(desc);
         repo.set_name(name);
         repo.set_has_issues(issues_present);
+        repo.set_language(language);
 
         Some(repo)
     }
