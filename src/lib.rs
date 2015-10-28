@@ -11,6 +11,10 @@
 //!
 //!     gar --fetch-rng --from 2013-10-10-13 --to 2014-11-11-14
 //!
+//! (WIP) To search for a particular feature, you can do the following:
+//!
+//!     gar --select url,name --where language:Rust
+//!
 extern crate rustc_serialize;
 extern crate time;
 
