@@ -3,6 +3,8 @@ use std::path::PathBuf;
 use std::fs::File;
 use flate2::read::GzDecoder;
 
+use models::repo::Repo;
+
 /// Given a path to the json.gz file,
 pub fn deflate_to_contents(p: PathBuf) -> Option<String> {
     let mut f: File = match File::open(p) {
@@ -23,7 +25,7 @@ pub fn deflate_to_contents(p: PathBuf) -> Option<String> {
     Some(decomp)
 }
 
-/// Each line in the data file corresponds into an entry
+/// Deflate and read each line. Each line in the data file corresponds into an entry
 pub fn lines_of(p: PathBuf) -> Vec<String> {
     let data: String = match deflate_to_contents(p) {
         Some(v) => v,

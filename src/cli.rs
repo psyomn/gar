@@ -158,7 +158,6 @@ pub fn show_paths() -> () {
 /// Given a select, and where clause, match and find against those.
 pub fn find(from: Option<String>, to: Option<String>,
             selects: Option<String>, wheres: Option<String>) -> () {
-    let files = choose_files_from_dates(from, to);
 }
 
 /// This will look into the ~/.config/gar/data folder, and match the filenames against the given

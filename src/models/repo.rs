@@ -1,5 +1,8 @@
+use std::path::PathBuf;
 use rustc_serialize::json::Json;
+
 use models::owner;
+use models::reader::lines_of;
 
 #[derive(Debug)]
 pub enum Event {
@@ -91,6 +94,23 @@ impl Repo {
 
     pub fn set_owner_email(&mut self, e: String) -> () {
         self.owner.set_email(e);
+    }
+
+    /// Given a path to a json.gz file, that file is read, and each line is parsed to a Repo
+    /// object.
+    pub fn from_path(p: PathBuf) -> Vec<Repo> {
+        let v: Vec<String> = lines_of(p);
+        let mut res: Vec<Repo> = Vec::new();
+
+        for line in v.into_iter() {
+            let r: Repo = match Repo::from_json(line) {
+                Some(v) => v,
+                None => continue,
+            };
+            res.push(r);
+        }
+
+        res
     }
 
     /// Given a json string, try to evaluate it into a repo
