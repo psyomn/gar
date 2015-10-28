@@ -39,10 +39,11 @@ fn main() {
 
     if opts.opt_present("select") {
         let selects: Option<String> = opts.opt_str("select");
-        let wheres: Option<String> =  opts.opt_str("wheres");
+        let wheres: Option<String> =  opts.opt_str("where");
         let from: Option<String> = opts.opt_str("from");
         let to: Option<String> = opts.opt_str("to");
         cli::find(from, to, selects, wheres);
+        return;
     }
 
     println!("run gar -h for help");

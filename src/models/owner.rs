@@ -25,6 +25,10 @@ impl Owner {
     pub fn set_email(&mut self, e: String) -> () {
         self.email = e;
     }
+
+    pub fn get_nick(&self) -> &String {
+        &self.email
+    }
 }
 
 pub struct OwnerBuilder {

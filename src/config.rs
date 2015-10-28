@@ -11,7 +11,6 @@ use std::env;
 use std::path::PathBuf;
 
 const NAME: &'static str = "gar";
-const LONG_NAME: &'static str = "githubarchive";
 const DATADIR: &'static str = "data";
 const PREFIX: &'static str = ".config";
 const CONFIG: &'static str = "gar.toml";

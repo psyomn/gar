@@ -7,9 +7,9 @@ use std::fs::File;
 use std::fs;
 use std::path::PathBuf;
 
-use models::reader::*;
 use models::repo::Repo;
 use models::archive::{Archive, ArchiveBuilder};
+use models::constraint::Constraint;
 
 /// Print the current version of GAR
 pub fn version() -> () {
@@ -155,9 +155,47 @@ pub fn show_paths() -> () {
         .collect::<Vec<()>>();
 }
 
+/// gar --select <feature>+ --date YYYY-mm-dd-hh
+pub fn find_date(selects: Option<String>, wheres: Option<String>, date: String) -> () {
+    let d2 = date.clone();
+    find(Some(date), Some(d2), selects, wheres);
+}
+
 /// Given a select, and where clause, match and find against those.
+/// gar --select <feature>+ --from <date> --to <date> --where <constraints>+
+///   where <date> is YYYY-mm-dd-hh
+///     and <constraints>+ is for example, language:Rust, name:potato
 pub fn find(from: Option<String>, to: Option<String>,
             selects: Option<String>, wheres: Option<String>) -> () {
+    let features: Vec<String> = match selects {
+        Some(s) => s.split(",").map(|e| e.to_string().clone()).collect(),
+        None => vec![],
+    };
+
+    let constraints: Vec<String> = match wheres {
+        Some(s) => s.split(",").map(|e| e.to_string().clone()).collect(),
+        None => vec![],
+    };
+
+    let vcon: Vec<Constraint> = constraints
+        .into_iter()
+        .map(|e| { let mut tmp = e.split(":");
+                   Constraint { label: tmp.next().unwrap().to_string(),
+                                value: tmp.next().unwrap().to_string(), }})
+        .collect();
+
+    println!("You want me to find things from {:?} to {:?}", from, to);
+    println!("Selects {:?}", features);
+    println!("Constraints {:?}", vcon);
+
+    let chosen_paths_from_dates: Vec<PathBuf> = choose_files_from_dates(from, to);
+
+    for pth in chosen_paths_from_dates {
+        for r in Repo::from_path(pth) {
+            /* r are the repos that are created when parsing a single gz file */
+
+        }
+    }
 }
 
 /// This will look into the ~/.config/gar/data folder, and match the filenames against the given

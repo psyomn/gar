@@ -3,6 +3,7 @@ use rustc_serialize::json::Json;
 
 use models::owner;
 use models::reader::lines_of;
+use models::constraint::Constraint;
 
 #[derive(Debug)]
 pub enum Event {
@@ -94,6 +95,19 @@ impl Repo {
 
     pub fn set_owner_email(&mut self, e: String) -> () {
         self.owner.set_email(e);
+    }
+
+    pub fn satisfies_constraints(&self, v: Vec<Constraint>) -> bool {
+        let mut b = true;
+        for cons in v.iter() {
+            if cons.label == "language" {
+                b &= cons.value == self.language;
+            }
+            if cons.label == "owner" {
+                b &= cons.value == *self.owner.get_nick();
+            }
+        }
+        b
     }
 
     /// Given a path to a json.gz file, that file is read, and each line is parsed to a Repo
