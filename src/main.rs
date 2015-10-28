@@ -46,6 +46,8 @@ fn main() {
             None => panic!("You need to provide argument(s) in the form of <feature>:<value>,+"),
         }
     }
+
+    println!("run gar -h for help");
 }
 
 fn make_opts() -> Options {
