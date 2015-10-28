@@ -208,7 +208,6 @@ impl Repo {
 }
 
 mod test {
-    use super::*;
     #[test]
     fn test_json_parse_simple() -> () {
         let r: Option<Repo> = Repo::from_json("{\"name\":\"potato\"".into());
