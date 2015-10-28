@@ -54,7 +54,7 @@ impl Archive {
         let title: String = Archive::make_title(self.date);
 
         if config::data_exists(&title) {
-            println!("Data {} exists in cache - skip", title);
+            ::print_yellow(format!("Data {} exists in cache - skip\n", title).as_ref());
             return;
         }
 
@@ -68,7 +68,7 @@ impl Archive {
 
         let mut data: Vec<u8> = vec![];
 
-        println!("Fetching {}", url_ref);
+        print!("Fetching {}", url_ref);
         match resp.read_to_end(&mut data) {
             Err(e) => { println!("{}", e); panic!(e)},
             _ => {},
@@ -77,8 +77,11 @@ impl Archive {
         self.data = data;
 
         if &self.data[0..5] == b"<?xml" {
-            println!("No such info found on server ({})", url);
+            ::print_magenta(format!("\nNo such info found on server ({})\n", url).as_ref());
             return;
+        }
+        else {
+            ::print_green(format!(" ok\n").as_ref());
         }
 
         if config::caching_on() { self.store() }
