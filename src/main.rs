@@ -37,14 +37,12 @@ fn main() {
       cli::fetch_rng(opts.opt_str("from"), opts.opt_str("to"));
     }
 
-    if opts.opt_present("find") {
-        match opts.opt_str("find") {
-            Some(v) => {
-                cli::find(v);
-                return;
-            }
-            None => panic!("You need to provide argument(s) in the form of <feature>:<value>,+"),
-        }
+    if opts.opt_present("select") {
+        let selects: Option<String> = opts.opt_str("select");
+        let wheres: Option<String> =  opts.opt_str("wheres");
+        let from: Option<String> = opts.opt_str("from");
+        let to: Option<String> = opts.opt_str("to");
+        cli::find(from, to, selects, wheres);
     }
 
     println!("run gar -h for help");
@@ -62,6 +60,10 @@ fn make_opts() -> Options {
     options.optflag("", "fetch-rng", "use this with from, to opt flags to fetch a range of archives");
     options.optopt("", "from", "FROM", "specify date from (use with fetch)");
     options.optopt("", "to", "TO", "specify date to (use with fetch)");
+
+    // eg: gar --select url,name --where language:Rust
+    options.optopt("", "select", "SELECT", "select specific fields of matched repos");
+    options.optopt("", "where", "WHERE", "constraints on the select");
 
     options
 }

@@ -1,19 +1,22 @@
 use chrono::*;
+use walkdir::WalkDir;
 
-use models::archive::{Archive, ArchiveBuilder};
 use config::*;
 
+use std::fs::File;
 use std::fs;
 use std::path::PathBuf;
 
 use models::reader::*;
 use models::repo::Repo;
+use models::archive::{Archive, ArchiveBuilder};
 
 /// Print the current version of GAR
 pub fn version() -> () {
     println!("app version: {}", env!("CARGO_PKG_VERSION"));
 }
 
+/// Given a date in the format of "YYYY-m-d-h", parse the string into a DateTime<UTC> object
 fn parse_archive_date(date: String) -> Option<DateTime<UTC>> {
     let vals: Vec<&str> = date.split("-").collect::<Vec<&str>>();
 
@@ -44,6 +47,8 @@ fn parse_archive_date(date: String) -> Option<DateTime<UTC>> {
         0, 0))
 }
 
+/// Given a date in string format, try to make it into an archive object, which can then be used to
+/// fetch the data off the internets.
 fn parse_archive(date: String) -> Option<Archive> {
     let date = match parse_archive_date(date) {
         Some(v) => v,
@@ -150,39 +155,43 @@ pub fn show_paths() -> () {
         .collect::<Vec<()>>();
 }
 
-pub fn find(vals: String) -> () {
-    use std::fs::File;
-    use walkdir::WalkDir;
+/// Given a select, and where clause, match and find against those.
+pub fn find(from: Option<String>, to: Option<String>,
+            selects: Option<String>, wheres: Option<String>) -> () {
+    let files = choose_files_from_dates(from, to);
+}
 
+/// This will look into the ~/.config/gar/data folder, and match the filenames against the given
+/// dates. If the match is successful, then the path to that archive is returned.
+fn choose_files_from_dates(from: Option<String>, to: Option<String>) -> Vec<PathBuf> {
+    let mut v: Vec<PathBuf> = get_data_file_paths();
+    if from.is_some() && to.is_some() {
+        v.into_iter().collect()
+    }
+    else if from.is_some() && to.is_none() {
+        v.into_iter().collect()
+    }
+    else if from.is_none() && to.is_some() {
+        v.into_iter().collect()
+    }
+    else {
+        /* Both none - match all */
+        v.into_iter().collect()
+    }
+}
+
+fn get_data_file_paths() -> Vec<PathBuf> {
     let p: PathBuf = data_path();
     let start = WalkDir::new(p);
-    let mut v: Vec<String> = Vec::new();
+    let mut v: Vec<PathBuf> = Vec::new();
 
     for entry in start.into_iter().filter_map(|e| e.ok()) {
         let eisf = File::open(entry.path()).ok().unwrap()
             .metadata().ok().unwrap().file_type().is_file();
-
         if eisf {
-            println!("{}", entry.path().to_str().unwrap());
-            let file_path: String = entry.path().to_str().unwrap().to_string();
-            v.push(file_path);
+            v.push(entry.path().to_path_buf());
         }
     }
 
-    match v.pop() {
-        Some(v) => {
-            let first_line = lines_of(PathBuf::from(v)).iter().nth(0).unwrap().clone();
-            println!("supplying {}", first_line);
-            let repo = Repo::from_json(first_line);
-            match repo {
-                Some(v) => {
-                    println!("{:#?}", v);
-                },
-                None => {
-                    println!("Won't print anything");
-                }
-            }
-        },
-        None => println!("nothing to do"),
-    }
+    v
 }
