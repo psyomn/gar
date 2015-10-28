@@ -31,7 +31,7 @@ pub fn lines_of(p: PathBuf) -> Vec<String> {
     };
 
     data.lines()
-        .map(|e| e.to_string())
+        .map(|e| e.into())
         .collect()
 }
 
