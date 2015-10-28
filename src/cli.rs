@@ -145,9 +145,9 @@ pub fn ls_data() -> () {
 
 /// Print the standard paths that the app uses.
 pub fn show_paths() -> () {
-    println!("Base: {:?}", config_path());
-    println!("Data: {:?}", data_path());
-    println!("Conf: {:?}", config_file_path());
+    let v = vec![config_path(), data_path(), config_file_path()];
+    v.into_iter().map(|e| ::print_green(format!("  {}\n", e.to_str().unwrap()).as_ref()))
+        .collect::<Vec<()>>();
 }
 
 pub fn find(vals: String) -> () {
