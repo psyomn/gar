@@ -105,11 +105,6 @@ impl Archive {
         f.write_all(&self.data).unwrap();
     }
 
-    /// Calls fetch, but also caches the data for future use
-    pub fn fetch_and_store(&self) -> () {
-        println!("TODO");
-    }
-
     /// Set the year of the archive we're interested in
     pub fn set_year(&mut self, year: i32) -> () {
         self.date = UTC.ymd(year, self.date.month(), self.date.day())

@@ -45,7 +45,10 @@ fn parse_archive_date(date: String) -> Option<DateTime<UTC>> {
 }
 
 fn parse_archive(date: String) -> Option<Archive> {
-    let date = parse_archive_date(date).unwrap();
+    let date = match parse_archive_date(date) {
+        Some(v) => v,
+        None => return None,
+    };
 
     let year  = date.year();
     let month = date.month();
@@ -80,7 +83,7 @@ pub fn fetch_rng(from: Option<String>, to: Option<String>) -> () {
         println!("You need to supply both from, and to option flags");
     }
 
-    let fr_v = fr.unwrap();
+    let mut fr_v = fr.unwrap();
     let to_v = to.unwrap();
 
     if fr_v > to_v {
@@ -88,12 +91,19 @@ pub fn fetch_rng(from: Option<String>, to: Option<String>) -> () {
         println!("From is after To in this case");
     }
 
+    let one_hour = Duration::minutes(60);
+    let mut date_strings: Vec<String> = Vec::new();
 
-    println!("Before duration, fr_v is: {}", fr_v);
-    let d = Duration::minutes(60);
-    let tmp = fr_v + d;
-    println!("After duration, fr_v is: {}", tmp);
+    while fr_v != to_v {
+        /* And now generate the dates within the range by incrementing by hour */
+        let s: String = format!("{}", fr_v.format("%Y-%m-%d-%H"));
+        date_strings.push(s);
+        fr_v = fr_v + one_hour;
+    }
 
+    for date in date_strings {
+        fetch(date);
+    }
 }
 
 /// Argument provided should be in the form dd-mm-YYYY
