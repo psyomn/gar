@@ -4,7 +4,7 @@ use rustc_serialize::json::Json;
 use models::owner;
 use models::reader::lines_of;
 use models::constraint::Constraint;
-use models::event::Event;
+use models::event_type::EventType;
 
 #[derive(Debug)]
 pub struct Repo {
@@ -18,7 +18,7 @@ pub struct Repo {
     watchers: u64,
     stargazers: u64,
     forks: u64,
-    event_type: Option<Event>,
+    event_type: Option<EventType>,
 }
 
 /// Models a repo event, in the file obtained from githubarchive.
@@ -51,7 +51,7 @@ impl Repo {
         self.forks = f;
     }
 
-    pub fn set_event_type(&mut self, e: Option<Event>) -> () {
+    pub fn set_event_type(&mut self, e: Option<EventType>) -> () {
         self.event_type = e;
     }
 
@@ -141,16 +141,16 @@ impl Repo {
             Some(v) => v.as_object().unwrap(),
         };
 
-        let event: Option<Event> = match obj.get("type") {
+        let event: Option<EventType> = match obj.get("type") {
             None => None,
             Some(v) => match *v {
                 Json::String(ref s) => {
                     let st: &str = s.as_ref();
                     match st {
-                        "CreateEvent" => Some(Event::Create),
-                        "ForkEvent" => Some(Event::Fork),
-                        "IssueCommentEvent" => Some(Event::IssueComment),
-                        _ => Some(Event::Other)
+                        "CreateEvent" => Some(EventType::Create),
+                        "ForkEvent" => Some(EventType::Fork),
+                        "IssueCommentEvent" => Some(EventType::IssueComment),
+                        _ => Some(EventType::Other)
                     }
                 },
                 _ => None,
