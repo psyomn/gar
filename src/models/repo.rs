@@ -97,7 +97,7 @@ impl Repo {
         self.owner.set_email(e);
     }
 
-    pub fn satisfies_constraints(&self, v: Vec<Constraint>) -> bool {
+    pub fn satisfies_constraints(&self, v: &Vec<Constraint>) -> bool {
         let mut b = true;
         for cons in v.iter() {
             if cons.label == "language" {

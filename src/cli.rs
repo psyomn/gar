@@ -186,14 +186,16 @@ pub fn find(from: Option<String>, to: Option<String>,
 
     println!("You want me to find things from {:?} to {:?}", from, to);
     println!("Selects {:?}", features);
-    println!("Constraints {:?}", vcon);
 
-    let chosen_paths_from_dates: Vec<PathBuf> = choose_files_from_dates(from, to);
+    let chosen_paths_from_dates: Vec<PathBuf> =
+        choose_files_from_dates(from, to);
 
     for pth in chosen_paths_from_dates {
         for r in Repo::from_path(pth) {
             /* r are the repos that are created when parsing a single gz file */
-
+            if r.satisfies_constraints(&vcon) {
+                println!("{:#?}", r);
+            }
         }
     }
 }
