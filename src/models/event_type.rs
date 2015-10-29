@@ -3,7 +3,7 @@ pub enum EventType {
     Create,
     Fork,
     Other,
-    CommitCommen,
+    CommitComment,
     Delete,
     Deployment,
     DeploymentStatus,
