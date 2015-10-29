@@ -145,6 +145,22 @@ impl Repo {
 
         let obj = dt.as_object().unwrap();
 
+        let created_at: Option<DateTime<UTC>> = match obj.get("created_at") {
+            Some(v) => {
+                match *v {
+                    Json::String(ref s) => {
+                        let date_str: String = s.clone();
+                        match date_str.parse::<DateTime<UTC>>() {
+                            Ok(v) => Some(v),
+                            Err(..) => None,
+                        }
+                    },
+                    _ => None,
+                }
+            },
+            None => None
+        };
+
         let repo = match obj.get("repository") {
             None => return None,
             Some(v) => v.as_object().unwrap(),
@@ -280,6 +296,7 @@ impl Repo {
         repo.set_stargazers(num_stargazers);
         repo.watchers = watchers;
         repo.forks = forks;
+        repo.created_at = created_at;
 
         Some(repo)
     }
