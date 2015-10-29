@@ -171,8 +171,7 @@ impl Repo {
                         "StatusEvent"                   => Some(EventType::Status),
                         "TeamAddEvent"                  => Some(EventType::TeamAdd),
                         "WatchEvent"                    => Some(EventType::Watch),
-                        "" => None,
-                        _ => Some(EventType::Other)
+                        _                               => None,
                     }
                 },
                 _ => None,
