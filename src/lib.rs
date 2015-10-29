@@ -42,7 +42,7 @@ fn print_green(s: &str) -> () {
 
 #[inline]
 fn print_red(s: &str) -> () {
-    generic_print(s, term::color::GREEN);
+    generic_print(s, term::color::RED);
 }
 
 fn print_magenta(s: &str) -> () {
