@@ -99,6 +99,7 @@ impl Repo {
         self.created_at = Some(e);
     }
 
+    /// Provided a list of constraints, this will return true only if ALL of them are satisfied
     pub fn satisfies_constraints(&self, v: &Vec<Constraint>) -> bool {
         let mut b = true;
         for cons in v.iter() {
@@ -286,7 +287,6 @@ impl Repo {
 
 mod test {
     use models::repo::Repo;
-
     #[test]
     fn test_json_parse_simple() -> () {
         let r: Option<Repo> = Repo::from_json("{\"name\":\"potato\"".into());
