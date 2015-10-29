@@ -4,13 +4,7 @@ use rustc_serialize::json::Json;
 use models::owner;
 use models::reader::lines_of;
 use models::constraint::Constraint;
-
-#[derive(Debug)]
-pub enum Event {
-    CreateEvent,
-    ForkEvent,
-    Other,
-}
+use models::event::Event;
 
 #[derive(Debug)]
 pub struct Repo {
@@ -153,8 +147,8 @@ impl Repo {
                 Json::String(ref s) => {
                     let st: &str = s.as_ref();
                     match st {
-                        "CreateEvent" => Some(Event::CreateEvent),
-                        "ForkEvent" => Some(Event::ForkEvent),
+                        "CreateEvent" => Some(Event::Create),
+                        "ForkEvent" => Some(Event::Fork),
                         _ => Some(Event::Other)
                     }
                 },
