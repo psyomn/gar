@@ -3,8 +3,6 @@ use std::path::PathBuf;
 use std::fs::File;
 use flate2::read::GzDecoder;
 
-use models::repo::Repo;
-
 /// Given a path to the json.gz file,
 pub fn deflate_to_contents(p: PathBuf) -> Option<String> {
     let mut f: File = match File::open(p) {
@@ -20,7 +18,7 @@ pub fn deflate_to_contents(p: PathBuf) -> Option<String> {
     let mut d = GzDecoder::new(bb).unwrap();
     let mut decomp: String = String::new();
 
-    let bytecount = d.read_to_string(&mut decomp).unwrap();
+    d.read_to_string(&mut decomp).unwrap();
 
     Some(decomp)
 }

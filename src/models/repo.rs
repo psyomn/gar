@@ -126,7 +126,7 @@ impl Repo {
         let dt = match Json::from_str(data.as_ref()) {
             Ok(v) => v,
             Err(e) => {
-                println!("Could not parse anything given:\n{}", data);
+                ::print_red(format!("Could not parse anything given:\n{}", data).as_ref());
                 println!("Err: {}", e);
                 return None;
             },
@@ -149,6 +149,7 @@ impl Repo {
                     match st {
                         "CreateEvent" => Some(Event::Create),
                         "ForkEvent" => Some(Event::Fork),
+                        "IssueCommentEvent" => Some(Event::IssueComment),
                         _ => Some(Event::Other)
                     }
                 },
@@ -230,6 +231,7 @@ impl Repo {
         repo.set_has_issues(issues_present);
         repo.set_language(language);
         repo.set_event_type(event);
+        repo.set_stargazers(num_stargazers);
 
         Some(repo)
     }

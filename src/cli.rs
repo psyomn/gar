@@ -60,7 +60,7 @@ fn parse_archive(date: String) -> Option<Archive> {
     let day   = date.day();
     let hour  = date.hour();
 
-    let mut a: Archive =
+    let a: Archive =
         ArchiveBuilder::new()
             .year(year)
             .month(month)
@@ -203,7 +203,7 @@ pub fn find(from: Option<String>, to: Option<String>,
 /// This will look into the ~/.config/gar/data folder, and match the filenames against the given
 /// dates. If the match is successful, then the path to that archive is returned.
 fn choose_files_from_dates(from: Option<String>, to: Option<String>) -> Vec<PathBuf> {
-    let mut v: Vec<PathBuf> = get_data_file_paths();
+    let v: Vec<PathBuf> = get_data_file_paths();
     if from.is_some() && to.is_some() {
         v.into_iter().collect()
     }
