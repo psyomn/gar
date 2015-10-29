@@ -145,7 +145,7 @@ impl Repo {
             None => None,
             Some(v) => match *v {
                 Json::String(ref s) => {
-                    match st.as_ref() {
+                    match s.as_ref() {
                         "CreateEvent"                   => Some(EventType::Create),
                         "CommitCommentEvent"            => Some(EventType::CommitComment),
                         "DeleteEvent"                   => Some(EventType::Delete),
