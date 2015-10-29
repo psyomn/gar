@@ -6,6 +6,8 @@ use models::reader::lines_of;
 use models::constraint::Constraint;
 use models::event_type::EventType;
 
+use chrono::*;
+
 #[derive(Debug)]
 pub struct Repo {
     gh_id: u64,
@@ -19,6 +21,7 @@ pub struct Repo {
     stargazers: u64,
     forks: u64,
     event_type: Option<EventType>,
+    created_at: Option<DateTime<UTC>>,
 }
 
 /// Models a repo event, in the file obtained from githubarchive.
@@ -36,6 +39,7 @@ impl Repo {
             stargazers: 0,
             forks: 0,
             event_type: None,
+            created_at: None,
         }
     }
 
@@ -89,6 +93,10 @@ impl Repo {
 
     pub fn set_owner_email(&mut self, e: String) -> () {
         self.owner.set_email(e);
+    }
+
+    pub fn set_created_at(&mut self, e: DateTime<UTC>) -> () {
+        self.created_at = Some(e);
     }
 
     pub fn satisfies_constraints(&self, v: &Vec<Constraint>) -> bool {
@@ -242,6 +250,22 @@ impl Repo {
             None => 0,
         };
 
+        let watchers: u64 = match repo.get("watchers") {
+            Some(v) => match *v {
+                Json::U64(num) => num,
+                _ => 0,
+            },
+            None => 0,
+        };
+
+        let forks: u64 = match repo.get("forks") {
+            Some(v) => match *v {
+                Json::U64(num) => num,
+                _ => 0,
+            },
+            None => 0,
+        };
+
         let mut repo: Repo = Repo::new();
 
         repo.set_gh_id(gh_id);
@@ -253,18 +277,19 @@ impl Repo {
         repo.set_language(language);
         repo.set_event_type(event);
         repo.set_stargazers(num_stargazers);
+        repo.watchers = watchers;
+        repo.forks = forks;
 
         Some(repo)
     }
 }
 
 mod test {
+    use models::repo::Repo;
+
     #[test]
     fn test_json_parse_simple() -> () {
         let r: Option<Repo> = Repo::from_json("{\"name\":\"potato\"".into());
-        match r {
-            None => assert!(true),
-            _ => assert!(false),
-        }
+        assert!(r.is_none());
     }
 }
