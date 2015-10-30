@@ -1,3 +1,5 @@
+use models::payloads::*;
+
 #[derive(Debug)]
 pub enum EventType {
     Create,
@@ -13,7 +15,7 @@ pub enum EventType {
     Gist,
     Gollum,
     IssueComment,
-    Issues,
+    Issues(Option<IssuePayload>),
     Member,
     Membership,
     PageBuild,

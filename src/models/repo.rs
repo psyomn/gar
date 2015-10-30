@@ -6,6 +6,8 @@ use models::reader::lines_of;
 use models::constraint::Constraint;
 use models::event_type::EventType;
 
+use models::payloads::IssuePayload;
+
 use chrono::*;
 
 #[derive(Debug)]
@@ -185,7 +187,7 @@ impl Repo {
                         "GistEvent"                     => Some(EventType::Gist),
                         "GollumEvent"                   => Some(EventType::Gollum),
                         "IssueCommentEvent"             => Some(EventType::IssueComment),
-                        "IssuesEvent"                   => Some(EventType::Issues),
+                        "IssuesEvent"                   => Some(EventType::Issues(IssuePayload::from_json(&repo.get("payload")))),
                         "MemberEvent"                   => Some(EventType::Member),
                         "MembershipEvent"               => Some(EventType::Membership),
                         "PageBuildEvent"                => Some(EventType::PageBuild),
