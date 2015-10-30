@@ -187,7 +187,7 @@ impl Repo {
                         "GistEvent"                     => Some(EventType::Gist),
                         "GollumEvent"                   => Some(EventType::Gollum),
                         "IssueCommentEvent"             => Some(EventType::IssueComment),
-                        "IssuesEvent"                   => Some(EventType::Issues(IssuePayload::from_json(&repo.get("payload")))),
+                        "IssuesEvent"                   => Some(EventType::Issues(IssuePayload::from_json(&obj.get("payload")))),
                         "MemberEvent"                   => Some(EventType::Member),
                         "MembershipEvent"               => Some(EventType::Membership),
                         "PageBuildEvent"                => Some(EventType::PageBuild),
