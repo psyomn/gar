@@ -20,6 +20,7 @@ pub struct Repo {
     watchers: u64,
     stargazers: u64,
     forks: u64,
+    open_issues: u64,
     event_type: Option<EventType>,
     created_at: Option<DateTime<UTC>>,
 }
@@ -38,6 +39,7 @@ impl Repo {
             watchers: 0,
             stargazers: 0,
             forks: 0,
+            open_issues: 0,
             event_type: None,
             created_at: None,
         }
@@ -283,6 +285,14 @@ impl Repo {
             None => 0,
         };
 
+        let open_issues: u64 = match repo.get("open_issues") {
+            Some(v) => match *v {
+                Json::U64(num) => num,
+                _ => 0,
+            },
+            None => 0,
+        };
+
         let mut repo: Repo = Repo::new();
 
         repo.set_gh_id(gh_id);
@@ -297,11 +307,13 @@ impl Repo {
         repo.watchers = watchers;
         repo.forks = forks;
         repo.created_at = created_at;
+        repo.open_issues = open_issues;
 
         Some(repo)
     }
 }
 
+#[cfg(test)]
 mod test {
     use models::repo::Repo;
     #[test]
