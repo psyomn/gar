@@ -81,7 +81,12 @@ impl PushPayload {
             None => {},
         }
 
-        None
+        Some(PushPayload {
+            head: head,
+            refs: refs,
+            size: size,
+            shas: shas,
+        })
     }
 }
 
