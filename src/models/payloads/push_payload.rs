@@ -49,34 +49,10 @@ impl PushPayload {
             Some(v) => match v {
                 &Json::Array(ref a) => {
                     for ref sha in a.iter() {
-                        let mut sha_str: String = String::new();
-                        let mut email_str: String = String::new();
-                        let mut desc_str: String = String::new();
-                        let mut user_str: String = String::new();
-
-                        match *sha {
-                             &Json::Array(ref vec) => {
-                                 for (ix, val) in vec.iter().enumerate() {
-                                     match (ix,val) {
-                                         (0, &Json::String(ref s)) => sha_str   = s.clone(),
-                                         (1, &Json::String(ref s)) => email_str = s.clone(),
-                                         (2, &Json::String(ref s)) => desc_str  = s.clone(),
-                                         (3, &Json::String(ref s)) => user_str  = s.clone(),
-                                         (_, &Json::Boolean(b))    => distinct  = b,
-                                         _ => {},
-                                     }
-                                 }
-                             },
-                             _ => {}
+                        match ShaElement::from_json(&Some(sha)) {
+                            Some(v) => shas.push(v),
+                            None => continue,
                         }
-
-                        shas.push(
-                            ShaElement::from_values(
-                                sha_str,
-                                email_str,
-                                desc_str,
-                                user_str,
-                                distinct));
                     }
                 },
                 _ => {},
