@@ -40,11 +40,9 @@ impl PushPayload {
             None => 0,
         };
 
-        let mut distinct = false;
         let mut shas: Vec<ShaElement> = Vec::new();
 
         // TODO not too happy about this.
-        // TODO this should be moved inside sha_element
         match obj.get("shas") {
             Some(v) => match v {
                 &Json::Array(ref a) => {
