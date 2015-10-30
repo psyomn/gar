@@ -32,7 +32,6 @@ impl PushPayload {
             None => "".into(),
         };
 
-        let none: &Vec<Json> = &vec![];
         let size = match obj.get("size") {
             Some(v) => match *v {
                 Json::U64(v) => v,
