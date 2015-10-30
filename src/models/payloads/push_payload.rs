@@ -55,9 +55,6 @@ impl PushPayload {
                         let mut user_str: String = String::new();
 
                         match *sha {
-                             // &Json::String(ref s) => match ix {
-                             // },
-                             // &Json::Boolean(b) => distinct = b,
                              &Json::Array(ref vec) => {
                                  for (ix, val) in vec.iter().enumerate() {
                                      match (ix,val) {
