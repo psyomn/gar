@@ -41,7 +41,7 @@ impl Archive {
     }
 
     fn make_date(d: DateTime<UTC>) -> String {
-        d.format("%Y-%m-%d-%H").to_string()
+        d.format("%Y-%m-%d-%-k").to_string()
     }
 
     fn make_title(d: DateTime<UTC>) -> String {
