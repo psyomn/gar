@@ -27,6 +27,6 @@ pub enum EventType {
     Repository,
     Status,
     TeamAdd,
-    Watch,
+    Watch(Option<WatchPayload>),
 }
 

@@ -6,7 +6,7 @@ use models::reader::lines_of;
 use models::constraint::Constraint;
 use models::event_type::EventType;
 
-use models::payloads::IssuePayload;
+use models::payloads::*;
 
 use chrono::*;
 
@@ -199,7 +199,7 @@ impl Repo {
                         "RepositoryEvent"               => Some(EventType::Repository),
                         "StatusEvent"                   => Some(EventType::Status),
                         "TeamAddEvent"                  => Some(EventType::TeamAdd),
-                        "WatchEvent"                    => Some(EventType::Watch),
+                        "WatchEvent"                    => Some(EventType::Watch(WatchPayload::from_json(&obj.get("payload")))),
                         _                               => None,
                     }
                 },

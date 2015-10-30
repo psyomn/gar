@@ -1,5 +1,6 @@
 use rustc_serialize::json::*;
 
+#[derive(Debug)]
 pub struct WatchPayload {
     action: String,
 }
