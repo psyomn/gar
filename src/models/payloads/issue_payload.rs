@@ -9,7 +9,44 @@ pub struct IssuePayload {
 
 impl IssuePayload {
     pub fn from_json(json: &Option<&Json>) -> Option<IssuePayload> {
-        None
+        if json.is_none() { return None }
+
+        let ref obj = *json.unwrap();
+
+        if !obj.is_object() { return None }
+
+        let json = obj.as_object().unwrap();
+
+        let action: String = match json.get("action") {
+            Some(v) => match *v {
+                Json::String(ref s) => s.clone(),
+                _ => "".into(),
+            },
+            None => "".into(),
+        };
+
+        let issue: u64 = match json.get("issue") {
+            Some(v) => match *v {
+                Json::U64(v) => v,
+                _ => 0,
+            },
+            None => 0,
+        };
+
+        let number: u64 = match json.get("number") {
+            Some(v) => match *v {
+                Json::U64(v) => v,
+                _ => 0,
+            },
+            None => 0,
+        };
+
+        Some(
+            IssuePayloadBuilder::new()
+                .action(action)
+                .issue(issue)
+                .number(number)
+                .finalize())
     }
 }
 
@@ -44,7 +81,7 @@ impl IssuePayloadBuilder {
         IssuePayloadBuilder {
             action: self.action,
             issue: self.issue,
-            number: self.number,
+            number: n,
         }
     }
 
