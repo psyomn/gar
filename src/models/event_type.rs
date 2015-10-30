@@ -22,7 +22,7 @@ pub enum EventType {
     Public,
     PullRequest,
     PullRequestReviewComment,
-    Push,
+    Push(Option<PushPayload>),
     Release,
     Repository,
     Status,

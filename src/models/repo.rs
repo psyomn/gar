@@ -194,7 +194,7 @@ impl Repo {
                         "PublicEvent"                   => Some(EventType::Public),
                         "PullRequestEvent"              => Some(EventType::PullRequest),
                         "PullRequestReviewCommentEvent" => Some(EventType::PullRequestReviewComment),
-                        "PushEvent"                     => Some(EventType::Push),
+                        "PushEvent"                     => Some(EventType::Push(PushPayload::from_json(&obj.get("payload")))),
                         "ReleaseEvent"                  => Some(EventType::Release),
                         "RepositoryEvent"               => Some(EventType::Repository),
                         "StatusEvent"                   => Some(EventType::Status),
