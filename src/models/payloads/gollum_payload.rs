@@ -35,6 +35,8 @@ impl GollumPayload {
             _ => {},
         }
 
-        None
+        Some(GollumPayload {
+            pages: pes_vec,
+        })
     }
 }
