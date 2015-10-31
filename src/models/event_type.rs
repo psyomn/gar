@@ -13,7 +13,7 @@ pub enum EventType {
     Follow,
     ForkApply,
     Gist,
-    Gollum,
+    Gollum(Option<GollumPayload>),
     IssueComment,
     Issues(Option<IssuePayload>),
     Member,
