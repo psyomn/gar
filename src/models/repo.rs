@@ -5,6 +5,7 @@ use models::owner;
 use models::reader::lines_of;
 use models::constraint::Constraint;
 use models::event_type::EventType;
+use models::json_helpers::JsonHelper;
 
 use models::payloads::*;
 
@@ -215,85 +216,16 @@ impl Repo {
             None => 0
         };
 
-        let name: String = match repo.get("name") {
-            Some(v) => match *v {
-                Json::String(ref s) => s.clone(),
-                _ => "".into(),
-            },
-            None => "".into(),
-        };
-
-        let url: String = match repo.get("url") {
-            Some(v) => match *v {
-                Json::String(ref s) => s.clone(),
-                _ => "".into(),
-            },
-            None => "".into(),
-        };
-
-        let desc: String = match repo.get("description") {
-            Some(v) => match *v {
-                Json::String(ref s) => s.clone(),
-                _ => "".into(),
-            },
-            None => "".into(),
-        };
-
-        let owner_name: String = match repo.get("owner") {
-            Some(v) => match *v {
-                Json::String(ref s) => s.clone(),
-                _ => "".into(),
-            },
-            None => "".into(),
-        };
-
-        let issues_present: bool = match repo.get("has_issues") {
-            Some(v) => match *v {
-                Json::Boolean(b) => b,
-                _ => false,
-            },
-            None => false,
-        };
-
-        let language: String = match repo.get("language") {
-            Some(v) => match *v {
-                Json::String(ref s) => s.clone(),
-                _ => "".into(),
-            },
-            None => "".into(),
-        };
-
-        let num_stargazers: u64 = match repo.get("stargazers") {
-            Some(v) => match *v {
-                Json::U64(num) => num,
-                _ => 0,
-            },
-            None => 0,
-        };
-
-        let watchers: u64 = match repo.get("watchers") {
-            Some(v) => match *v {
-                Json::U64(num) => num,
-                _ => 0,
-            },
-            None => 0,
-        };
-
-        let forks: u64 = match repo.get("forks") {
-            Some(v) => match *v {
-                Json::U64(num) => num,
-                _ => 0,
-            },
-            None => 0,
-        };
-
-        let open_issues: u64 = match repo.get("open_issues") {
-            Some(v) => match *v {
-                Json::U64(num) => num,
-                _ => 0,
-            },
-            None => 0,
-        };
+        let name: String = JsonHelper::string_or_empty(repo.get("name"));
+        let url: String = JsonHelper::string_or_empty(repo.get("url"));
+        let desc: String = JsonHelper::string_or_empty(repo.get("description"));
+        let owner_name: String = JsonHelper::string_or_empty(repo.get("owner"));
+        let issues_present: bool = JsonHelper::boolean_or_false(repo.get("has_issues"));
+        let language: String = JsonHelper::string_or_empty(repo.get("language"));
+        let num_stargazers: u64 = JsonHelper::number_or_zero(repo.get("stargazers"));
+        let watchers: u64 = JsonHelper::number_or_zero(repo.get("watchers"));
+        let forks: u64 = JsonHelper::number_or_zero(repo.get("forks"));
+        let open_issues: u64 = JsonHelper::number_or_zero(repo.get("open_issues"));
 
         let mut repo: Repo = Repo::new();
 

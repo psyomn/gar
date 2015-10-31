@@ -1,4 +1,5 @@
 use rustc_serialize::json::Json;
+use models::json_helpers::JsonHelper;
 
 /// This is one of the elements found within the GollumEvent payload
 #[derive(Debug)]
@@ -10,26 +11,16 @@ pub struct PageElement {
     summary: Option<String>,
 }
 
-fn string_or_empty(s: Option<&Json>) -> String {
-    match s {
-        Some(v) => match v {
-            &Json::String(ref s) => s.clone(),
-            _ => "".into(),
-        },
-        None => "".into()
-    }
-}
-
 impl PageElement {
     pub fn from_json(json: &Json) -> Option<PageElement> {
         if !json.is_object() { return None }
 
         let obj = json.as_object().unwrap();
 
-        let action    = string_or_empty(obj.get("action"));
-        let html_url  = string_or_empty(obj.get("html_url"));
-        let page_name = string_or_empty(obj.get("page_name"));
-        let sha       = string_or_empty(obj.get("sha"));
+        let action    = JsonHelper::string_or_empty(obj.get("action"));
+        let html_url  = JsonHelper::string_or_empty(obj.get("html_url"));
+        let page_name = JsonHelper::string_or_empty(obj.get("page_name"));
+        let sha       = JsonHelper::string_or_empty(obj.get("sha"));
 
         let summary: Option<String> = match obj.get("summary") {
             Some(v) => match *v {
