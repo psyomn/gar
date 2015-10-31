@@ -177,7 +177,7 @@ impl Repo {
                     match s.as_ref() {
                         "CreateEvent"                   => Some(EventType::Create),
                         "CommitCommentEvent"            => Some(EventType::CommitComment),
-                        "DeleteEvent"                   => Some(EventType::Delete),
+                        "DeleteEvent"                   => Some(EventType::Delete(DeletePayload::from_json(&obj.get("payload")))),
                         "DeploymentEvent"               => Some(EventType::Deployment),
                         "DeploymentStatusEvent"         => Some(EventType::DeploymentStatus),
                         "DownloadEvent"                 => Some(EventType::Download),

@@ -6,7 +6,7 @@ pub enum EventType {
     Fork,
     Other,
     CommitComment,
-    Delete,
+    Delete(Option<DeletePayload>),
     Deployment,
     DeploymentStatus,
     Download,
