@@ -204,18 +204,47 @@ pub fn find(from: Option<String>, to: Option<String>,
 /// dates. If the match is successful, then the path to that archive is returned.
 fn choose_files_from_dates(from: Option<String>, to: Option<String>) -> Vec<PathBuf> {
     let v: Vec<PathBuf> = get_data_file_paths();
+
+    #[inline]
+    fn date_from_path(p: &PathBuf) -> DateTime<UTC> {
+        let mut dt: DateTime<UTC> = UTC::now();
+        let filename = p.file_name();
+
+        match filename {
+            Some(v) => parse_archive_date(v.to_str().unwrap().to_string()).unwrap(),
+            None => dt
+        }
+    }
+
     if from.is_some() && to.is_some() {
-        v.into_iter().collect()
+        let from_date: DateTime<UTC> = parse_archive_date(from.unwrap()).unwrap();
+        let to_date: DateTime<UTC> = parse_archive_date(to.unwrap()).unwrap();
+
+        v.into_iter()
+         .filter(|e|{
+            let dfp = date_from_path(e);
+            dfp >= from_date && dfp <= to_date })
+         .collect()
+
     }
     else if from.is_some() && to.is_none() {
-        v.into_iter().collect()
+        let from_date: DateTime<UTC> = parse_archive_date(from.unwrap()).unwrap();
+
+        v.into_iter()
+         .filter(|e| date_from_path(e) >= from_date)
+         .collect()
     }
     else if from.is_none() && to.is_some() {
-        v.into_iter().collect()
+        let to_date: DateTime<UTC> = parse_archive_date(to.unwrap()).unwrap();
+
+        v.into_iter()
+         .filter(|e| date_from_path(e) <= to_date)
+         .collect()
     }
     else {
         /* Both none - match all */
-        v.into_iter().collect()
+        v.into_iter()
+         .collect()
     }
 }
 
