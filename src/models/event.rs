@@ -12,7 +12,7 @@ use models::payloads::*;
 use chrono::*;
 
 #[derive(Debug)]
-pub struct Repo {
+pub struct Event {
     gh_id: u64,
     name: String,
     description: String,
@@ -29,9 +29,9 @@ pub struct Repo {
 }
 
 /// Models a repo event, in the file obtained from githubarchive.
-impl Repo {
-    pub fn new() -> Repo {
-        Repo {
+impl Event {
+    pub fn new() -> Event {
+        Event {
             gh_id: 0,
             name: "default".into(),
             language: "default".into(),
@@ -118,14 +118,14 @@ impl Repo {
         b
     }
 
-    /// Given a path to a json.gz file, that file is read, and each line is parsed to a Repo
+    /// Given a path to a json.gz file, that file is read, and each line is parsed to a Event
     /// object.
-    pub fn from_path(p: PathBuf) -> Vec<Repo> {
+    pub fn from_path(p: PathBuf) -> Vec<Event> {
         let v: Vec<String> = lines_of(p);
-        let mut res: Vec<Repo> = Vec::new();
+        let mut res: Vec<Event> = Vec::new();
 
         for line in v.into_iter() {
-            let r: Repo = match Repo::from_json(line) {
+            let r: Event = match Event::from_json(line) {
                 Some(v) => v,
                 None => continue,
             };
@@ -136,7 +136,7 @@ impl Repo {
     }
 
     /// Given a json string, try to evaluate it into a repo
-    pub fn from_json(data: String) -> Option<Repo> {
+    pub fn from_json(data: String) -> Option<Event> {
         let dt = match Json::from_str(data.as_ref()) {
             Ok(v) => v,
             Err(e) => {
@@ -227,7 +227,7 @@ impl Repo {
         let forks: u64 = JsonHelper::number_or_zero(repo.get("forks"));
         let open_issues: u64 = JsonHelper::number_or_zero(repo.get("open_issues"));
 
-        let mut repo: Repo = Repo::new();
+        let mut repo: Event = Event::new();
 
         repo.set_gh_id(gh_id);
         repo.set_url(url);
@@ -249,10 +249,10 @@ impl Repo {
 
 #[cfg(test)]
 mod test {
-    use models::repo::Repo;
+    use models::repo::Event;
     #[test]
     fn test_json_parse_simple() -> () {
-        let r: Option<Repo> = Repo::from_json("{\"name\":\"potato\"".into());
+        let r: Option<Event> = Event::from_json("{\"name\":\"potato\"".into());
         assert!(r.is_none());
     }
 }

@@ -7,7 +7,7 @@ use std::fs::File;
 use std::fs;
 use std::path::PathBuf;
 
-use models::repo::Repo;
+use models::event::Event;
 use models::archive::{Archive, ArchiveBuilder};
 use models::constraint::Constraint;
 
@@ -188,7 +188,7 @@ pub fn find(from: Option<String>, to: Option<String>,
         choose_files_from_dates(from, to);
 
     for pth in chosen_paths_from_dates {
-        for r in Repo::from_path(pth) {
+        for r in Event::from_path(pth) {
             /* r are the repos that are created when parsing a single gz file */
             if r.satisfies_constraints(&vcon) {
                 println!("{:#?}", r);
