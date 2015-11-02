@@ -184,9 +184,6 @@ pub fn find(from: Option<String>, to: Option<String>,
                                 value: tmp.next().unwrap().to_string(), }})
         .collect();
 
-    println!("You want me to find things from {:?} to {:?}", from, to);
-    println!("Selects {:?}", features);
-
     let chosen_paths_from_dates: Vec<PathBuf> =
         choose_files_from_dates(from, to);
 
