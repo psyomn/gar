@@ -1,3 +1,4 @@
+use models::json_helpers::JsonHelper;
 use rustc_serialize::json::*;
 
 #[derive(Debug)]
@@ -14,20 +15,10 @@ impl WatchPayload {
 
     pub fn from_json(json: &Option<&Json>) -> Option<WatchPayload> {
         if json.is_none() { return None }
+        if !json.unwrap().is_object() { return None }
 
-        let ref preobj = *json.unwrap();
-
-        if !preobj.is_object() { return None }
-
-        let json = preobj.as_object().unwrap();
-
-        let action: String = match json.get("action") {
-            Some(v) => match *v {
-                Json::String(ref s) => s.clone(),
-                _ => "".into(),
-            },
-            None => "".into(),
-        };
+        let json = json.unwrap().as_object().unwrap();
+        let action: String = JsonHelper::string_or_empty(json.get("action"));
 
         Some(WatchPayload { action: action } )
     }
