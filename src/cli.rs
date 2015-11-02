@@ -211,7 +211,19 @@ fn choose_files_from_dates(from: Option<String>, to: Option<String>) -> Vec<Path
         let filename = p.file_name();
 
         match filename {
-            Some(v) => parse_archive_date(v.to_str().unwrap().to_string()).unwrap(),
+            Some(v) => {
+                let date = v.to_str()
+                            .unwrap()
+                            .split(".") /* because YYYY-mm-dd-h.json.gz */
+                            .nth(0)
+                            .unwrap()
+                            .to_string();
+
+                match parse_archive_date(date) {
+                    Some(date) => date,
+                    None => panic!("ruh roh"),
+                }
+            },
             None => dt
         }
     }
