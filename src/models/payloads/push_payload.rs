@@ -1,5 +1,6 @@
 use rustc_serialize::json::Json;
 use models::payloads::ShaElement;
+use models::json_helpers::JsonHelper;
 
 #[derive(Debug)]
 pub struct PushPayload {
@@ -16,29 +17,9 @@ impl PushPayload {
 
         let ref obj = json.unwrap().as_object().unwrap();
 
-        let head = match obj.get("head") {
-            Some(v) => match *v {
-                Json::String(ref s) => s.clone(),
-                _ => "".into(),
-            },
-            None => "".into(),
-        };
-
-        let refs = match obj.get("ref") {
-            Some(v) => match *v {
-                Json::String(ref s) => s.clone(),
-                _ => "".into(),
-            },
-            None => "".into(),
-        };
-
-        let size = match obj.get("size") {
-            Some(v) => match *v {
-                Json::U64(v) => v,
-                _ => 0,
-            },
-            None => 0,
-        };
+        let head = JsonHelper::string_or_empty(obj.get("head"));
+        let refs = JsonHelper::string_or_empty(obj.get("ref"));
+        let size = JsonHelper::number_or_zero(obj.get("size"));
 
         let mut shas: Vec<ShaElement> = Vec::new();
 
