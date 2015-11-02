@@ -5,6 +5,7 @@ pub mod push_payload;
 pub mod delete_payload;
 pub mod gollum_payload;
 pub mod page_element;
+pub mod issue_comment_payload;
 
 /* Rexports */
 pub use self::issue_payload::IssuePayload;
@@ -14,3 +15,5 @@ pub use self::push_payload::PushPayload;
 pub use self::delete_payload::DeletePayload;
 pub use self::gollum_payload::GollumPayload;
 pub use self::page_element::PageElement;
+pub use self::issue_comment_payload::IssueCommentPayload;
+

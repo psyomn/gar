@@ -14,7 +14,7 @@ pub enum EventType {
     ForkApply,
     Gist,
     Gollum(Option<GollumPayload>),
-    IssueComment,
+    IssueComment(Option<IssueCommentPayload>),
     Issues(Option<IssuePayload>),
     Member,
     Membership,
