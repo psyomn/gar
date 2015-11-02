@@ -187,7 +187,7 @@ impl Repo {
                         "ForkApplyEvent"                => Some(EventType::ForkApply),
                         "GistEvent"                     => Some(EventType::Gist),
                         "GollumEvent"                   => Some(EventType::Gollum(GollumPayload::from_json(&obj.get("payload")))),
-                        "IssueCommentEvent"             => Some(EventType::IssueComment),
+                        "IssueCommentEvent"             => Some(EventType::IssueComment(IssueCommentPayload::from_json(&obj.get("payload")))),
                         "IssuesEvent"                   => Some(EventType::Issues(IssuePayload::from_json(&obj.get("payload")))),
                         "MemberEvent"                   => Some(EventType::Member),
                         "MembershipEvent"               => Some(EventType::Membership),

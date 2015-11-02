@@ -1,3 +1,6 @@
+use rustc_serialize::json::Json;
+use models::json_helpers::JsonHelper;
+
 #[derive(Debug)]
 pub struct IssueCommentPayload {
     comment_id: u64,
@@ -5,10 +8,18 @@ pub struct IssueCommentPayload {
 }
 
 impl IssueCommentPayload {
-    fn new(c: u64, i: u64) -> IssueCommentPayload {
-        IssueCommentPayload {
-            comment_id: c,
-            issue_id: i,
-        }
+    pub fn from_json(json: &Option<&Json>) -> Option<IssueCommentPayload> {
+        if json.is_none() { return None }
+        if !json.unwrap().is_object() { return None }
+
+        let obj = json.unwrap().as_object().unwrap();
+
+        let cid: u64 = JsonHelper::number_or_zero(obj.get("comment_id"));
+        let iid: u64 = JsonHelper::number_or_zero(obj.get("issue_id"));
+
+        Some(IssueCommentPayload {
+            comment_id: cid,
+            issue_id: iid,
+        })
     }
 }
