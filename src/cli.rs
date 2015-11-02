@@ -207,7 +207,7 @@ fn choose_files_from_dates(from: Option<String>, to: Option<String>) -> Vec<Path
 
     #[inline]
     fn date_from_path(p: &PathBuf) -> DateTime<UTC> {
-        let mut dt: DateTime<UTC> = UTC::now();
+        let dt: DateTime<UTC> = UTC::now();
         let filename = p.file_name();
 
         match filename {
