@@ -62,6 +62,7 @@ fn make_opts() -> Options {
     options.optflag("", "fetch-rng", "use this with from, to opt flags to fetch a range of archives");
     options.optopt("", "from", "FROM", "specify date from (use with fetch)");
     options.optopt("", "to", "TO", "specify date to (use with fetch)");
+    options.optopt("", "template", "TEMPLATE", "specify the handlebar template to use");
 
     // eg: gar --select url,name --where language:Rust
     options.optopt("", "select", "SELECT", "select specific fields of matched repos");

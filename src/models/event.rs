@@ -1,3 +1,4 @@
+use regex::Regex;
 use std::path::PathBuf;
 use rustc_serialize::json::Json;
 
@@ -109,10 +110,81 @@ impl Event {
         let mut b = true;
         for cons in v.iter() {
             if cons.label == "language" {
+                /* Example: language:Rust */
                 b &= cons.value == self.language;
             }
             if cons.label == "owner" {
+                /* Example: owner:psyomn */
                 b &= cons.value == *self.owner.get_nick();
+            }
+            if cons.label == "name" {
+                /* Example: name:wayland
+                 * This will perform a regex match against the name of the repo
+                 */
+                let re_str: String = format!("(?i){}", cons.value);
+                let re: Regex = Regex::new(re_str.as_ref()).unwrap();
+                b &= re.is_match(self.name.as_ref());
+            }
+            if cons.label == "description" {
+                /* This does a wor dmatch against the description given to the event's repo */
+                let re_str: String = format!("(?i){}", cons.value);
+                let re: Regex = Regex::new(re_str.as_ref()).unwrap();
+                b &= re.is_match(self.description.as_ref());
+            }
+            if cons.label == "+watchers" {
+                /* TODO: parsing to int each time - this might not be good? */
+                let num: u64 = cons.value.parse::<u64>().ok().unwrap();
+                b &= num <= self.watchers;
+            }
+            if cons.label == "-watchers" {
+                /* TODO: parsing to int each time - this might not be good? */
+                let num: u64 = cons.value.parse::<u64>().ok().unwrap();
+                b &= num > self.watchers;
+            }
+            if cons.label == "+stargazers" {
+                /* TODO: parsing to int each time - this might not be good? */
+                let num: u64 = cons.value.parse::<u64>().ok().unwrap();
+                b &= num <= self.stargazers;
+            }
+            if cons.label == "-stargazers" {
+                /* TODO: parsing to int each time - this might not be good? */
+                let num: u64 = cons.value.parse::<u64>().ok().unwrap();
+                b &= num < self.stargazers;
+            }
+            if cons.label == "type" {
+                let etype: &EventType = match self.event_type {
+                    Some(ref v) => v,
+                    None => continue,
+                };
+
+                b &= match cons.value.as_ref() {
+                    "create"                      => match etype { &EventType::Create                   => true, _ => false },
+                    "commit_comment"              => match etype { &EventType::CommitComment            => true, _ => false },
+                    "delete"                      => match etype { &EventType::Delete(..)               => true, _ => false },
+                    "deployment"                  => match etype { &EventType::Deployment               => true, _ => false },
+                    "deployment_status"           => match etype { &EventType::DeploymentStatus         => true, _ => false },
+                    "download"                    => match etype { &EventType::Download                 => true, _ => false },
+                    "follow"                      => match etype { &EventType::Follow                   => true, _ => false },
+                    "fork"                        => match etype { &EventType::Fork                     => true, _ => false },
+                    "fork_apply"                  => match etype { &EventType::ForkApply                => true, _ => false },
+                    "gist"                        => match etype { &EventType::Gist                     => true, _ => false },
+                    "gollum"                      => match etype { &EventType::Gollum(..)               => true, _ => false },
+                    "issue_comment"               => match etype { &EventType::IssueComment(..)         => true, _ => false },
+                    "issues"                      => match etype { &EventType::Issues(..)               => true, _ => false },
+                    "member"                      => match etype { &EventType::Member                   => true, _ => false },
+                    "membership"                  => match etype { &EventType::Membership               => true, _ => false },
+                    "page_build"                  => match etype { &EventType::PageBuild                => true, _ => false },
+                    "public"                      => match etype { &EventType::Public                   => true, _ => false },
+                    "pull_request"                => match etype { &EventType::PullRequest              => true, _ => false },
+                    "pull_request_review_comment" => match etype { &EventType::PullRequestReviewComment => true, _ => false },
+                    "push"                        => match etype { &EventType::Push(..)                 => true, _ => false },
+                    "release"                     => match etype { &EventType::Release                  => true, _ => false },
+                    "repository"                  => match etype { &EventType::Repository               => true, _ => false },
+                    "status"                      => match etype { &EventType::Status                   => true, _ => false },
+                    "team_add"                    => match etype { &EventType::TeamAdd                  => true, _ => false },
+                    "watch"                       => match etype { &EventType::Watch(..)                => true, _ => false },
+                    _                             => true, /* Ignore erroneous input */
+                }
             }
         }
         b
