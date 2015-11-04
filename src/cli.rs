@@ -155,10 +155,11 @@ pub fn show_paths() -> () {
         .collect::<Vec<()>>();
 }
 
-/// gar --select <feature>+ --date YYYY-mm-dd-hh
-pub fn find_date(selects: Option<String>, wheres: Option<String>, date: String) -> () {
+/// gar --select <attribute>+ --where <feature>+ --date YYYY-mm-dd-hh
+pub fn find_date(selects: Option<String>, wheres: Option<String>,
+                 date: String, template: Option<String>) -> () {
     let d2 = date.clone();
-    find(Some(date), Some(d2), selects, wheres);
+    find(Some(date), Some(d2), selects, wheres, template);
 }
 
 /// Given a select, and where clause, match and find against those.
@@ -166,7 +167,8 @@ pub fn find_date(selects: Option<String>, wheres: Option<String>, date: String) 
 ///   where <date> is YYYY-mm-dd-hh
 ///     and <constraints>+ is for example, language:Rust, name:potato
 pub fn find(from: Option<String>, to: Option<String>,
-            selects: Option<String>, wheres: Option<String>) -> () {
+            selects: Option<String>, wheres: Option<String>,
+            template: Option<String>) -> () {
     let features: Vec<String> = match selects {
         Some(s) => s.split(",").map(|e| e.to_string().clone()).collect(),
         None => vec![],
@@ -184,12 +186,16 @@ pub fn find(from: Option<String>, to: Option<String>,
                                 value: tmp.next().unwrap().to_string(), }})
         .collect();
 
-    let chosen_paths_from_dates: Vec<PathBuf> =
-        choose_files_from_dates(from, to);
+    let chosen_paths_from_dates: Vec<PathBuf> = choose_files_from_dates(from, to);
+
 
     for pth in chosen_paths_from_dates {
         for r in Event::from_path(pth) {
             /* r are the repos that are created when parsing a single gz file */
+
+            /* This part should have a few logical branches depending on what the user wants to do.
+             * maybe default can be the pretty printing using the formatter bellow.
+             */
             if r.satisfies_constraints(&vcon) {
                 println!("{:#?}", r);
             }
