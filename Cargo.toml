@@ -9,6 +9,7 @@ name = "gar"
 
 [dependencies]
 chrono = "0.2.16"
+clap = "1.4.7"
 flate2 = "0.2.9"
 getopts = "0.2.14"
 handlebars = "0.11.2"
