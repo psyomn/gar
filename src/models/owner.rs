@@ -32,48 +32,41 @@ impl Owner {
 }
 
 pub struct OwnerBuilder {
-    owner: Owner,
+    gh_id: u64,
+    nick: String,
+    email: String,
 }
 
 /// Builder for the owner object (notice that Owner#new is private)
 impl OwnerBuilder {
     pub fn new() -> OwnerBuilder {
         OwnerBuilder {
-            owner: Owner::new()
+            gh_id: 0,
+            nick: "".into(),
+            email: "".into(),
         }
     }
 
-    pub fn gh_id(self, id: u64) -> OwnerBuilder {
-        OwnerBuilder {
-            owner: Owner {
-                gh_id: id,
-                nick: self.owner.nick,
-                email: self.owner.email,
-            }
-        }
+    pub fn gh_id(&mut self, id: u64) -> &mut OwnerBuilder {
+        self.gh_id = id;
+        self
     }
 
-    pub fn nick(self, nick: &str) -> OwnerBuilder {
-        OwnerBuilder{
-            owner: Owner {
-                gh_id: self.owner.gh_id,
-                nick: nick.into(),
-                email: self.owner.email
-            }
-        }
+    pub fn nick(&mut self, nick: &str) -> &mut OwnerBuilder {
+        self.nick = nick.into();
+        self
     }
 
-    pub fn email(self, email: &str) -> OwnerBuilder {
-        OwnerBuilder {
-            owner: Owner {
-                gh_id: self.owner.gh_id,
-                nick: self.owner.nick,
-                email: email.into(),
-            }
-        }
+    pub fn email(&mut self, email: &str) -> &mut OwnerBuilder {
+        self.email = email.into();
+        self
     }
 
-    pub fn finalize(self) -> Owner {
-        self.owner
+    pub fn finalize(&self) -> Owner {
+        Owner {
+            gh_id: self.gh_id,
+            nick: self.nick.clone(),
+            email: self.email.clone(),
+        }
     }
 }
