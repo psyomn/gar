@@ -140,13 +140,9 @@ impl ArchiveBuilder {
         }
     }
 
-    pub fn year(self, y: i32) -> ArchiveBuilder {
-        ArchiveBuilder {
-            year: y,
-            month: self.month,
-            day: self.day,
-            hour: self.hour,
-        }
+    pub fn year(&mut self, y: i32) -> &mut ArchiveBuilder {
+        self.year = y;
+        self
     }
 
     pub fn month(self, m: u32) -> ArchiveBuilder {
