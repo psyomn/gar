@@ -34,7 +34,8 @@ fn main() {
     }
 
     if opts.opt_present("fetch-rng") {
-      cli::fetch_rng(opts.opt_str("from"), opts.opt_str("to"));
+        cli::fetch_rng(opts.opt_str("from"), opts.opt_str("to"));
+        return;
     }
 
     if opts.opt_present("select") {
@@ -43,6 +44,7 @@ fn main() {
         let from: Option<String> = opts.opt_str("from");
         let to: Option<String> = opts.opt_str("to");
         let template: Option<String> = opts.opt_str("template");
+        let simple_print: bool = opts.opt_present("simple-print");
         cli::find(from, to, selects, wheres, template);
         return;
     }
@@ -63,6 +65,7 @@ fn make_opts() -> Options {
     options.optopt("", "from", "FROM", "specify date from (use with fetch)");
     options.optopt("", "to", "TO", "specify date to (use with fetch)");
     options.optopt("", "template", "TEMPLATE", "specify the handlebar template to use");
+    options.optflag("", "simple-print", "simple print results");
 
     // eg: gar --select url,name --where language:Rust
     options.optopt("", "select", "SELECT", "select specific fields of matched repos");
