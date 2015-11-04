@@ -145,34 +145,22 @@ impl ArchiveBuilder {
         self
     }
 
-    pub fn month(self, m: u32) -> ArchiveBuilder {
-        ArchiveBuilder {
-            year: self.year,
-            month: m,
-            day: self.day,
-            hour: self.hour,
-        }
+    pub fn month(&mut self, m: u32) -> &mut ArchiveBuilder {
+        self.month = m;
+        self
     }
 
-    pub fn day(self, d: u32) -> ArchiveBuilder {
-        ArchiveBuilder {
-            year: self.year,
-            month: self.month,
-            day: d,
-            hour: self.hour,
-        }
+    pub fn day(&mut self, d: u32) -> &mut ArchiveBuilder {
+        self.day = d;
+        self
     }
 
-    pub fn hour(self, h: u32) -> ArchiveBuilder {
-        ArchiveBuilder {
-            year: self.year,
-            month: self.month,
-            day: self.day,
-            hour: h,
-        }
+    pub fn hour(&mut self, h: u32) -> &mut ArchiveBuilder {
+        self.hour = h;
+        self
     }
 
-    pub fn finalize(self) -> Archive {
+    pub fn finalize(&self) -> Archive {
         Archive::new(
             self.year,
             self.month,
