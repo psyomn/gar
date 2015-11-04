@@ -50,7 +50,11 @@ impl IssuePayload {
     }
 }
 
-type IssuePayloadBuilder = IssuePayload;
+pub struct IssuePayloadBuilder {
+    action: String,
+    issue: u64,
+    number: u64,
+}
 
 impl IssuePayloadBuilder {
     pub fn new() -> IssuePayloadBuilder {
@@ -61,33 +65,24 @@ impl IssuePayloadBuilder {
         }
     }
 
-    pub fn action(self, s: String) -> IssuePayloadBuilder {
-        IssuePayloadBuilder {
-            action: s,
-            issue: self.issue,
-            number: self.number,
-        }
+    pub fn action(&mut self, s: String) -> &mut IssuePayloadBuilder {
+        self.action = s;
+        self
     }
 
-    pub fn issue(self, i: u64) -> IssuePayloadBuilder {
-        IssuePayloadBuilder {
-            action: self.action,
-            issue: i,
-            number: self.number,
-        }
+    pub fn issue(&mut self, i: u64) -> &mut IssuePayloadBuilder {
+        self.issue = i;
+        self
     }
 
-    pub fn number(self, n: u64) -> IssuePayloadBuilder {
-        IssuePayloadBuilder {
-            action: self.action,
-            issue: self.issue,
-            number: n,
-        }
+    pub fn number(&mut self, n: u64) -> &mut IssuePayloadBuilder {
+        self.number = n;
+        self
     }
 
-    pub fn finalize(self) -> IssuePayload {
+    pub fn finalize(&self) -> IssuePayload {
         IssuePayload {
-            action: self.action,
+            action: self.action.clone(),
             issue: self.issue,
             number: self.number,
         }
