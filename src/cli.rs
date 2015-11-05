@@ -86,6 +86,7 @@ pub fn fetch_rng(from: Option<String>, to: Option<String>) -> () {
 
     if fr.is_none() || to.is_none() {
         println!("You need to supply both from, and to option flags");
+        return;
     }
 
     let mut fr_v = fr.unwrap();
