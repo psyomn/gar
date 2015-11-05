@@ -69,7 +69,7 @@ fn main() {
         return;
     }
 
-    if matches.is_present("query") {
+    if let Some(matches) = matches.subcommand_matches("query") {
         let selects: Option<String> = matches.value_of("select").map(|e| e.into());
         let wheres: Option<String> = matches.value_of("where").map(|e| e.into());
         let from: Option<String> = matches.value_of("from").map(|e| e.into());
