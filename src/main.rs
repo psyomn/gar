@@ -27,6 +27,13 @@ fn main() {
                 (@arg to:   -t --to   +takes_value "the date in YYYY-mm-dd-h format")
             )
         )
+        (@subcommand query =>
+            (about: "for running queries on the retrieved data")
+            (@arg from:   -f --from +takes_value "specify query date in YYYY-mm-dd-h format")
+            (@arg to:     -t --to +takes_value "specify query date in YYYY-mm-dd-h format")
+            (@arg select: -s --select +takes_value "specify which fields to output")
+            (@arg where:  -w --where +takes_value "specify selection constraints")
+        )
     ).get_matches();
 
     if let Some(matches) = matches.subcommand_matches("fetch") {
@@ -61,6 +68,8 @@ fn main() {
         return;
     }
 
+    if matches.is_present("query") {
+    }
     // if opts.opt_present("select") {
     //     let selects: Option<String> = opts.opt_str("select");
     //     let wheres: Option<String> =  opts.opt_str("where");
@@ -72,5 +81,4 @@ fn main() {
     //     return;
     // }
 
-    // println!("run gar -h for help");
 }
