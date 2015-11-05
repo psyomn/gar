@@ -1,15 +1,9 @@
 extern crate walkdir;
-extern crate getopts;
 extern crate gar;
 #[macro_use] extern crate clap;
 
 use gar::cli;
 use gar::config;
-
-use std::env;
-use getopts::Options;
-
-use clap::{Arg, App, SubCommand};
 
 fn main() {
     config::init();
@@ -18,14 +12,38 @@ fn main() {
         (version: env!("CARGO_PKG_VERSION"))
         (author: "Simon psyomn Symeonidis <lethaljellybean@gmail.com>")
         (about: "Github Archive interfacing and querying tool")
+        (@arg version: -v --version "show the current version")
         (@subcommand show =>
             (about: "for printing different program information")
             (@arg data: -d --data "shows tha data folder")
             (@arg paths: -p --paths "show the paths the application uses")
         )
+        (@subcommand fetch =>
+            (about: "for fetching singular files")
+            (@arg file: --file +takes_value "the date in YYYY-mm-dd-h format")
+            (@subcommand range =>
+                (about: "for fetching from certain dates")
+                (@arg from: -f --from +takes_value "the date in YYYY-mm-dd-h format")
+                (@arg to:   -t --to   +takes_value "the date in YYYY-mm-dd-h format")
+            )
+        )
     ).get_matches();
 
+    if let Some(matches) = matches.subcommand_matches("fetch") {
+        if matches.is_present("file") {
+            let filename = matches.value_of("file").unwrap();
+            return;
+        }
+        if let Some(matches) = matches.subcommand_matches("range") {
+            let from = matches.value_of("from");
+            let to = matches.value_of("to");
+            return;
+        }
+    }
+
     if let Some(matches) = matches.subcommand_matches("show") {
+        /* gar show --data
+         * gar show --paths */
         if matches.is_present("data") {
             cli::ls_data();
             return;
@@ -36,15 +54,13 @@ fn main() {
         }
     }
 
+    if matches.is_present("version") {
+        cli::version();
+        return;
+    }
+
     // TODO: Bellow shall be migrated to clap
     //
-    // if opts.opt_present("show-paths") { cli::show_paths(); return }
-    // if opts.opt_present("ls-data") { cli::ls_data(); return }
-    // if opts.opt_present("v") { cli::version(); return }
-    // if opts.opt_present("h") {
-    //     help(args[0].clone().as_ref(), make_opts());
-    //     return;
-    // }
     // if opts.opt_present("f") {
     //     /* gar --fetch */
     //     match opts.opt_str("f") {
@@ -71,34 +87,4 @@ fn main() {
     // }
 
     // println!("run gar -h for help");
-}
-
-fn make_opts() -> Options {
-    let mut options: Options = Options::new();
-
-    options.optopt("f", "fetch", "FETCH", "fetch a particular archive");
-    options.optopt("", "find", "FEATURE", "feature to look for.");
-    options.optflag("h", "help", "print this");
-    options.optflag("v", "version", "show the version");
-    options.optflag("", "show-paths", "show the paths that the application uses");
-    options.optflag("", "ls-data", "print the data files");
-    options.optflag("", "fetch-rng", "use this with from, to opt flags to fetch a range of archives");
-    options.optopt("", "from", "FROM", "specify date from (use with fetch)");
-    options.optopt("", "to", "TO", "specify date to (use with fetch)");
-    options.optopt("", "template", "TEMPLATE", "specify the handlebar template to use");
-    options.optflag("", "simple-print", "simple print results");
-
-    // eg: gar --select url,name --where language:Rust
-    options.optopt("", "select", "SELECT", "select specific fields of matched repos");
-    options.optopt("", "where", "WHERE", "constraints on the select");
-
-    options
-}
-
-
-
-/// Print the options menu
-pub fn help(program: &str, opts: Options) -> () {
-    let brief = format!("{} [options]", program);
-    print!("{}", opts.usage(&brief));
 }
