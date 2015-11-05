@@ -186,6 +186,27 @@ impl Event {
                     _                             => true, /* Ignore erroneous input */
                 }
             }
+            if cons.label == "commit_comment" {
+                /* Prereq: for this match to happen, we want to make sure that we ahve a Push
+                 * Event, as the match depends on the respective payload */
+
+                let etype: &EventType = match self.event_type {
+                    Some(ref v) => v,
+                    None => continue,
+                };
+
+                match etype {
+                    &EventType::Push(ref payload) => {
+                        if let Some(ref payload) = *payload {
+                            /* Does the commit comment contain some particular text? */
+                            let txt: &str = cons.value.as_ref();
+                            b &= payload.sha_elements_contain_text_of(txt);
+                        }
+                    },
+                    _ => continue,
+                }
+
+            }
         }
         b
     }

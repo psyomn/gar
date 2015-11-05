@@ -1,4 +1,6 @@
+use regex::Regex;
 use rustc_serialize::json::Json;
+
 use models::payloads::ShaElement;
 use models::json_helpers::JsonHelper;
 
@@ -45,6 +47,17 @@ impl PushPayload {
             size: size,
             shas: shas,
         })
+    }
+
+    /// Given some text, check to see if any of the sha commits contain that text
+    pub fn sha_elements_contain_text_of(&self, text: &str) -> bool {
+        let re_txt: String = format!("(?i){}", text);
+        let re: Regex = Regex::new(re_txt.as_ref()).unwrap();
+
+        self.shas
+            .iter()
+            .map(|e| re.is_match(e.get_comment().as_ref()))
+            .fold(false, |e,sum| sum || e)
     }
 }
 

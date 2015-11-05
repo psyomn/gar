@@ -57,5 +57,9 @@ impl ShaElement {
             distinct: d,
         }
     }
+
+    pub fn get_comment(&self) -> &String {
+        &self.comment
+    }
 }
 

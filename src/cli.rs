@@ -156,6 +156,7 @@ pub fn show_paths() -> () {
         .collect::<Vec<()>>();
 }
 
+/// TODO: I'm not sure if this is supported anymore?
 /// gar --select <attribute>+ --where <feature>+ --date YYYY-mm-dd-hh
 pub fn find_date(selects: Option<String>, wheres: Option<String>,
                  date: String, template: Option<String>) -> () {
