@@ -32,11 +32,13 @@ fn main() {
     if let Some(matches) = matches.subcommand_matches("fetch") {
         if matches.is_present("file") {
             let filename = matches.value_of("file").unwrap();
+            cli::fetch(filename.into());
             return;
         }
         if let Some(matches) = matches.subcommand_matches("range") {
-            let from = matches.value_of("from");
-            let to = matches.value_of("to");
+            let from = matches.value_of("from").map(|e| e.into());
+            let to = matches.value_of("to").map(|e| e.into());
+            cli::fetch_rng(from, to);
             return;
         }
     }
@@ -58,22 +60,6 @@ fn main() {
         cli::version();
         return;
     }
-
-    // TODO: Bellow shall be migrated to clap
-    //
-    // if opts.opt_present("f") {
-    //     /* gar --fetch */
-    //     match opts.opt_str("f") {
-    //         Some(v) => cli::fetch(v),
-    //         None => panic!("You need to supply a date for fetch"),
-    //     }
-    //     return;
-    // }
-
-    // if opts.opt_present("fetch-rng") {
-    //     cli::fetch_rng(opts.opt_str("from"), opts.opt_str("to"));
-    //     return;
-    // }
 
     // if opts.opt_present("select") {
     //     let selects: Option<String> = opts.opt_str("select");
