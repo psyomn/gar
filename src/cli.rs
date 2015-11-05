@@ -13,7 +13,7 @@ use models::constraint::Constraint;
 
 /// Print the current version of GAR
 pub fn version() -> () {
-    println!("app version: {}", env!("CARGO_PKG_VERSION"));
+    println!("gar version {}", env!("CARGO_PKG_VERSION"));
 }
 
 /// Given a date in the format of "YYYY-m-d-h", parse the string into a DateTime<UTC> object
