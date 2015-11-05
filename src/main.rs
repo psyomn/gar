@@ -33,6 +33,7 @@ fn main() {
             (@arg to:     -t --to +takes_value "specify query date in YYYY-mm-dd-h format")
             (@arg select: -s --select +takes_value "specify which fields to output")
             (@arg where:  -w --where +takes_value "specify selection constraints")
+            (@arg template: -m --template +takes_value "specify handlebar template for output")
         )
     ).get_matches();
 
@@ -69,16 +70,12 @@ fn main() {
     }
 
     if matches.is_present("query") {
+        let selects: Option<String> = matches.value_of("select").map(|e| e.into());
+        let wheres: Option<String> = matches.value_of("where").map(|e| e.into());
+        let from: Option<String> = matches.value_of("from").map(|e| e.into());
+        let to: Option<String> = matches.value_of("to").map(|e| e.into());
+        let template: Option<String> = matches.value_of("template").map(|e| e.into());
+        cli::find(from, to, selects, wheres, template);
+        return;
     }
-    // if opts.opt_present("select") {
-    //     let selects: Option<String> = opts.opt_str("select");
-    //     let wheres: Option<String> =  opts.opt_str("where");
-    //     let from: Option<String> = opts.opt_str("from");
-    //     let to: Option<String> = opts.opt_str("to");
-    //     let template: Option<String> = opts.opt_str("template");
-    //     let simple_print: bool = opts.opt_present("simple-print");
-    //     cli::find(from, to, selects, wheres, template);
-    //     return;
-    // }
-
 }
