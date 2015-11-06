@@ -13,7 +13,7 @@ impl WatchPayload {
         }
     }
 
-    pub fn from_json(json: &Option<&Json>) -> Option<WatchPayload> {
+    pub fn from_json(json: Option<&Json>) -> Option<WatchPayload> {
         if json.is_none() { return None }
         if !json.unwrap().is_object() { return None }
 

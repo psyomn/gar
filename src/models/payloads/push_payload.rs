@@ -13,7 +13,7 @@ pub struct PushPayload {
 }
 
 impl PushPayload {
-    pub fn from_json(json: &Option<&Json>) -> Option<PushPayload> {
+    pub fn from_json(json: Option<&Json>) -> Option<PushPayload> {
         if json.is_none() { return None }
         if !json.unwrap().is_object() { return None }
 

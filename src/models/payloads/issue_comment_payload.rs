@@ -8,7 +8,7 @@ pub struct IssueCommentPayload {
 }
 
 impl IssueCommentPayload {
-    pub fn from_json(json: &Option<&Json>) -> Option<IssueCommentPayload> {
+    pub fn from_json(json: Option<&Json>) -> Option<IssueCommentPayload> {
         if json.is_none() { return None }
         if !json.unwrap().is_object() { return None }
 

@@ -7,7 +7,7 @@ pub struct GollumPayload {
 }
 
 impl GollumPayload {
-    pub fn from_json(json: &Option<&Json>) -> Option<GollumPayload> {
+    pub fn from_json(json: Option<&Json>) -> Option<GollumPayload> {
         if json.is_none() { return None }
 
         let ref obj = match json.unwrap().as_object() {

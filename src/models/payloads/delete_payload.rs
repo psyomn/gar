@@ -7,7 +7,7 @@ pub struct DeletePayload {
 }
 
 impl DeletePayload {
-    pub fn from_json(json: &Option<&Json>) -> Option<DeletePayload> {
+    pub fn from_json(json: Option<&Json>) -> Option<DeletePayload> {
         if json.is_none() { return None }
         if !json.unwrap().is_object() { return None }
 
