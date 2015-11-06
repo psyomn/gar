@@ -12,10 +12,11 @@ pub struct PageElement {
 }
 
 impl PageElement {
-    pub fn from_json(json: &Json) -> Option<PageElement> {
-        if !json.is_object() { return None }
+    pub fn from_json(json: &Option<&Json>) -> Option<PageElement> {
+        if json.is_none() { return None }
+        if !json.unwrap().is_object() { return None }
 
-        let obj = json.as_object().unwrap();
+        let obj = json.unwrap().as_object().unwrap();
 
         let action    = JsonHelper::string_or_empty(obj.get("action"));
         let html_url  = JsonHelper::string_or_empty(obj.get("html_url"));

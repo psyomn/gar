@@ -26,7 +26,7 @@ impl GollumPayload {
             &Json::Array(ref vec) => {
                 for el in vec.iter() {
                     /* Iterate over each page entry/object */
-                    match PageElement::from_json(el) {
+                    match PageElement::from_json(&Some(el)) {
                         None => continue,
                         Some(v) => pes_vec.push(v),
                     }
