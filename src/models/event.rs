@@ -365,7 +365,28 @@ impl Event {
         map
     }
 
-    pub fn to_btree_with_all_features() -> () {
+    pub fn to_btree_with_all_features(&self) -> BTreeMap<String, String> {
+        let mut map: BTreeMap<String, String> = BTreeMap::new();
+
+        map.insert("id".into(), self.gh_id.to_string());
+        map.insert("name".into(), self.name.clone());
+        map.insert("description".into(), self.description.clone());
+        map.insert("language".into(), self.language.clone());
+        map.insert("has_issues".into(), self.has_issues.to_string());
+        map.insert("owner".into(), self.owner.get_nick().clone());
+        map.insert("url".into(), self.url.clone());
+        map.insert("watchers".into(), self.watchers.to_string());
+        map.insert("stargazers".into(), self.stargazers.to_string());
+        map.insert("forks".into(), self.forks.to_string());
+
+        if let Some(ref etype) = self.event_type {
+            map.insert("event_type".into(), etype.to_string());
+        }
+        if let Some(date) = self.created_at {
+            map.insert("created_at".into(), date.to_rfc3339());
+        }
+
+        map
     }
 }
 
