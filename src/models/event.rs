@@ -1,5 +1,7 @@
-use regex::Regex;
+use std::collections::BTreeMap;
 use std::path::PathBuf;
+
+use regex::Regex;
 use rustc_serialize::json::Json;
 
 use models::owner;
@@ -291,14 +293,71 @@ impl Event {
 
         Some(repo)
     }
-}
 
-#[cfg(test)]
-mod test {
-    use models::repo::Event;
-    #[test]
-    fn test_json_parse_simple() -> () {
-        let r: Option<Event> = Event::from_json("{\"name\":\"potato\"".into());
-        assert!(r.is_none());
+    /// Gives a flat json hash with labels and values.
+    pub fn to_btree_with_features_of(&self, f: Vec<String>) -> BTreeMap<String, String> {
+        let mut map: BTreeMap<String, String> = BTreeMap::new();
+
+        let id_label: String = "id".into();
+        let name_label: String = "name".into();
+        let desc: String = "description".into();
+        let lang: String = "language".into();
+        let has_issues: String = "has_issues".into();
+        let owner: String = "owner".into();
+        let url: String = "url".into();
+        let watchers: String = "watchers".into();
+        let stargazers: String = "stargazers".into();
+        let forks: String = "forks".into();
+        let open_issues: String = "forks".into();
+        let event_type: String = "event_type".into();
+        let created_at: String = "created_at".into();
+
+        if ::vec_contains(&f, &id_label) {
+            map.insert(id_label, self.gh_id.to_string());
+        }
+        if ::vec_contains(&f, &name_label) {
+            map.insert(name_label, self.name.clone());
+        }
+        if ::vec_contains(&f, &desc) {
+            map.insert(desc, self.description.clone());
+        }
+        if ::vec_contains(&f, &lang) {
+            map.insert(lang, self.language.clone());
+        }
+        if ::vec_contains(&f, &has_issues) {
+            map.insert(has_issues, self.has_issues.to_string());
+        }
+        if ::vec_contains(&f, &owner) {
+            map.insert(owner, self.owner.get_nick().clone());
+        }
+        if ::vec_contains(&f, &url) {
+            map.insert(url, self.url.clone());
+        }
+        if ::vec_contains(&f, &watchers) {
+            map.insert(watchers, self.watchers.to_string());
+        }
+        if ::vec_contains(&f, &stargazers) {
+            map.insert(stargazers, self.stargazers.to_string());
+        }
+        if ::vec_contains(&f, &forks) {
+            map.insert(forks, self.forks.to_string());
+        }
+        if ::vec_contains(&f, &open_issues) {
+            map.insert(open_issues, self.open_issues.to_string());
+        }
+        if ::vec_contains(&f, &event_type) {
+            // TODO
+            // map.insert(event_type, self.event_type.to_string());
+        }
+        if ::vec_contains(&f, &created_at) {
+            // TODO
+            // map.insert(created_at, self.created_at.format());
+        }
+
+        map
+    }
+
+    pub fn to_btree_with_all_features() -> () {
     }
 }
+

@@ -6,14 +6,6 @@ pub struct Owner {
 }
 
 impl Owner {
-    fn new() -> Owner {
-        Owner {
-            gh_id: 0,
-            nick: "default".into(),
-            email: "default@default".into(),
-        }
-    }
-
     pub fn set_gh_id(&mut self, id: u64) -> () {
         self.gh_id = id;
     }
