@@ -218,30 +218,29 @@ impl Event {
         let mut res: Vec<Event> = Vec::new();
 
         for line in v.into_iter() {
-            let r: Event = match Event::from_json(line) {
-                Some(v) => v,
-                None => continue,
+            let json_line: Json = match Json::from_str(line.as_ref()) {
+                Ok(v)  => v,
+                Err(e) => {
+                    ::print_red(format!("Could not parse anything given:\n{}", line).as_ref());
+                    println!("Err: {}", e);
+                    continue;
+                },
             };
-            res.push(r);
+
+            if let Some(v) = Event::from_json(Some(&json_line)) {
+                res.push(v);
+            };
         }
 
         res
     }
 
     /// Given a json string, try to evaluate it into a repo
-    pub fn from_json(data: String) -> Option<Event> {
-        let dt = match Json::from_str(data.as_ref()) {
-            Ok(v) => v,
-            Err(e) => {
-                ::print_red(format!("Could not parse anything given:\n{}", data).as_ref());
-                println!("Err: {}", e);
-                return None;
-            },
-        };
+    pub fn from_json(json: Option<&Json>) -> Option<Event> {
+        if json.is_none() { return None }
+        if !json.unwrap().is_object() { return None }
 
-        if !dt.is_object() { return None }
-
-        let obj = dt.as_object().unwrap();
+        let obj = json.unwrap().as_object().unwrap();
 
         let created_at: Option<DateTime<UTC>> = match obj.get("created_at") {
             Some(v) => {
