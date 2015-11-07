@@ -346,12 +346,20 @@ impl Event {
             map.insert(open_issues, self.open_issues.to_string());
         }
         if ::vec_contains(&f, &event_type) {
-            // TODO
-            // map.insert(event_type, self.event_type.to_string());
+            if let Some(ref etype) = self.event_type {
+                map.insert(event_type, etype.to_string());
+            }
+            else {
+                map.insert(event_type, "null".into());
+            }
         }
         if ::vec_contains(&f, &created_at) {
-            // TODO
-            // map.insert(created_at, self.created_at.format());
+            if let Some(date) = self.created_at {
+                map.insert(created_at, date.to_rfc3339());
+            }
+            else {
+                map.insert(created_at, "null".into());
+            }
         }
 
         map
