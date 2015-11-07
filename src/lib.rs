@@ -25,6 +25,7 @@ extern crate regex;
 extern crate term;
 extern crate flate2;
 extern crate walkdir;
+extern crate handlebars;
 
 pub mod models;
 pub mod config;
