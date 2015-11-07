@@ -300,14 +300,7 @@ impl Event {
             },
         };
 
-        let gh_id = match repo.get("id") {
-            Some(v) => match *v {
-                Json::U64(id) => id,
-                _ => 0,
-            },
-            None => 0
-        };
-
+        let gh_id = JsonHelper::number_or_zero(repo.get("id"));
         let name: String = JsonHelper::string_or_empty(repo.get("name"));
         let url: String = JsonHelper::string_or_empty(repo.get("url"));
         let desc: String = JsonHelper::string_or_empty(repo.get("description"));
