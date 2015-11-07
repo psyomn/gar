@@ -49,46 +49,6 @@ impl Event {
         }
     }
 
-    pub fn set_watchers(&mut self, w: u64) -> () {
-        self.watchers = w;
-    }
-
-    pub fn set_stargazers(&mut self, s: u64) -> () {
-        self.stargazers = s;
-    }
-
-    pub fn set_forks(&mut self, f: u64) -> () {
-        self.forks = f;
-    }
-
-    pub fn set_event_type(&mut self, e: Option<EventType>) -> () {
-        self.event_type = e;
-    }
-
-    pub fn set_description(&mut self, s: String) -> () {
-        self.description = s;
-    }
-
-    pub fn set_gh_id(&mut self, id: u64) -> () {
-        self.gh_id = id;
-    }
-
-    pub fn set_name(&mut self, s: String) -> () {
-        self.name = s;
-    }
-
-    pub fn set_language(&mut self, l: String) -> () {
-        self.language = l;
-    }
-
-    pub fn set_has_issues(&mut self, b: bool) -> () {
-        self.has_issues = b;
-    }
-
-    pub fn set_url(&mut self, s: String) -> () {
-        self.url = s;
-    }
-
     pub fn set_owner_gh_id(&mut self, id: u64) -> () {
         self.owner.set_gh_id(id);
     }
@@ -314,15 +274,16 @@ impl Event {
 
         let mut repo: Event = Event::new();
 
-        repo.set_gh_id(gh_id);
-        repo.set_url(url);
         repo.set_owner_nick(owner_name);
-        repo.set_description(desc);
-        repo.set_name(name);
-        repo.set_has_issues(issues_present);
-        repo.set_language(language);
-        repo.set_event_type(event);
-        repo.set_stargazers(num_stargazers);
+
+        repo.gh_id = gh_id;
+        repo.url = url;
+        repo.description = desc;
+        repo.name = name;
+        repo.has_issues = issues_present;
+        repo.language = language;
+        repo.event_type = event;
+        repo.stargazers = num_stargazers;
         repo.watchers = watchers;
         repo.forks = forks;
         repo.created_at = created_at;
