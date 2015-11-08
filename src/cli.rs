@@ -192,6 +192,8 @@ pub fn find(from: Option<String>, to: Option<String>,
 
     let chosen_paths_from_dates: Vec<PathBuf> = choose_files_from_dates(from, to);
 
+    // TODO: This might need to be broken down to other functions later on
+
     if let Some(template) = template {
         // Try to find the template
         let template_path: PathBuf = PathBuf::from(template);
@@ -204,7 +206,11 @@ pub fn find(from: Option<String>, to: Option<String>,
         f.read_to_string(&mut temp_contents).unwrap();
 
         let mut handlebars = Handlebars::new();
-        handlebars.register_template_string("provided_template", temp_contents).ok().unwrap();
+
+        match handlebars.register_template_string("provided_template", temp_contents) {
+            Ok(..) => {},
+            Err(e) => panic!("Problem registering template: {}", e),
+        }
 
         for pth in chosen_paths_from_dates {
             for r in Event::from_path(pth) {
