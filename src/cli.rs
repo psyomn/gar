@@ -211,8 +211,11 @@ pub fn find(from: Option<String>, to: Option<String>,
             for r in Event::from_path(pth) {
                 if r.satisfies_constraints(&vcon) {
                     let btree_json = r.to_btree_with_all_features();
-                    let result = handlebars.render("provided_template", &btree_json);
-                    println!("{:?}", result);
+                    match handlebars.render("provided_template", &btree_json) {
+                        Ok(v) => print!("{}", v),
+                        Err(..) => continue,
+                    }
+
                 }
             }
         }
