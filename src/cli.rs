@@ -1,8 +1,11 @@
 use chrono::*;
 use walkdir::WalkDir;
+use handlebars::{Handlebars, RenderError, RenderContext, Helper, Context};
+use rustc_serialize::json::{ToJson, Json};
 
 use config::*;
 
+use std::io::Read;
 use std::fs::File;
 use std::fs;
 use std::path::PathBuf;
@@ -190,16 +193,41 @@ pub fn find(from: Option<String>, to: Option<String>,
 
     let chosen_paths_from_dates: Vec<PathBuf> = choose_files_from_dates(from, to);
 
+    if let Some(template) = template {
+        // Try to find the template
+        let template_path: PathBuf = PathBuf::from(template);
+        let mut temp_contents: String = String::new();
+        let mut f: File = match File::open(template_path) {
+            Ok(f) => f,
+            Err(e) => panic!("Could not load template: {}", e),
+        };
 
-    for pth in chosen_paths_from_dates {
-        for r in Event::from_path(pth) {
-            /* r are the repos that are created when parsing a single gz file */
+        f.read_to_string(&mut temp_contents).unwrap();
 
-            /* This part should have a few logical branches depending on what the user wants to do.
-             * maybe default can be the pretty printing using the formatter bellow.
-             */
-            if r.satisfies_constraints(&vcon) {
-                println!("{:#?}", r);
+        let mut handlebars = Handlebars::new();
+        handlebars.register_template_string("provided_template", temp_contents).ok().unwrap();
+
+        for pth in chosen_paths_from_dates {
+            for r in Event::from_path(pth) {
+                if r.satisfies_constraints(&vcon) {
+                    let btree_json = r.to_btree_with_all_features();
+                    let result = handlebars.render("provided_template", &btree_json);
+                    println!("{:?}", result);
+                }
+            }
+        }
+    }
+    else {
+        for pth in chosen_paths_from_dates {
+            for r in Event::from_path(pth) {
+                /* r are the repos that are created when parsing a single gz file */
+
+                /* This part should have a few logical branches depending on what the user wants to do.
+                 * maybe default can be the pretty printing using the formatter bellow.
+                 */
+                if r.satisfies_constraints(&vcon) {
+                    println!("{:#?}", r);
+                }
             }
         }
     }
