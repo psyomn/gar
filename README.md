@@ -122,3 +122,44 @@ These are the event types you can capture using these labels:
         status
         team_add
         watch
+## Handlebars
+
+You can format your output with a handlebar template. That is, each time that something is
+found, a handlebars template is used, and is printed in the stdout this way. Maybe this will
+change in the future. Also for the time being, payloads are not printed in the output of
+handlebar templates, another feature that might be added in the future. Essentially you should
+look for certain things in events, and get the information of that repo, by piping to file.
+
+Example:
+
+    Your handlebar template:
+
+        ==== Some entry ======================
+        The repo name is {{ name }}
+        The repo id is {{ id }}
+        The repo url is {{ url }}
+        ======================================
+
+    And your query should look like this:
+
+        gar query --where language:Rust --template /tmp/temp.hbs 
+
+    Which should give you output like this:
+
+        ...
+        ==== Some entry ======================
+        The repo name is rust
+        The repo id is 724712
+        The repo url is https://github.com/mozilla/rust
+        ======================================
+        ==== Some entry ======================
+        The repo name is rust
+        The repo id is 724712
+        The repo url is https://github.com/mozilla/rust
+        ======================================
+        ==== Some entry ======================
+        The repo name is rust
+        The repo id is 724712
+        The repo url is https://github.com/mozilla/rust
+        ======================================
+        ...
