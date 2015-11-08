@@ -1,7 +1,6 @@
 use chrono::*;
 use walkdir::WalkDir;
-use handlebars::{Handlebars, RenderError, RenderContext, Helper, Context};
-use rustc_serialize::json::{ToJson, Json};
+use handlebars::{Handlebars};
 
 use config::*;
 
