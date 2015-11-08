@@ -192,9 +192,13 @@ fn print_green(s: &str) -> () {
 
 #[inline]
 fn print_red(s: &str) -> () {
-    generic_print(s, term::color::RED);
+    let mut t = term::stderr().unwrap();
+    t.fg(term::color::RED).unwrap();
+    write!(t, "{}", s).unwrap();
+    t.reset().unwrap();
 }
 
+#[inline]
 fn print_magenta(s: &str) -> () {
     generic_print(s, term::color::MAGENTA);
 }
