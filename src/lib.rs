@@ -95,33 +95,34 @@
 //!
 //! These are the event types you can capture using these labels:
 //!
-//!     type:<event-type> where <event-type> is:
+//! type:<event-type> where <event-type> is:
 //!
-//!         create
-//!         commit_comment
-//!         delete
-//!         deployment
-//!         deployment_status
-//!         download
-//!         follow
-//!         fork
-//!         fork_apply
-//!         gist
-//!         gollum
-//!         issue_comment
-//!         issues
-//!         member
-//!         membership
-//!         page_build
-//!         public
-//!         pull_request
-//!         pull_request_review_comment
-//!         push
-//!         release
-//!         repository
-//!         status
-//!         team_add
-//!         watch
+//! * create
+//! * commit_comment
+//! * delete
+//! * deployment
+//! * deployment_status
+//! * download
+//! * follow
+//! * fork
+//! * fork_apply
+//! * gist
+//! * gollum
+//! * issue_comment
+//! * issues
+//! * member
+//! * membership
+//! * page_build
+//! * public
+//! * pull_request
+//! * pull_request_review_comment
+//! * push
+//! * release
+//! * repository
+//! * status
+//! * team_add
+//! * watch
+//!
 //! # Handlebars
 //!
 //! You can format your output with a handlebar template. That is, each time that something is
@@ -142,7 +143,7 @@
 //!
 //!     And your query should look like this:
 //!
-//!         gar query --where language:Rust --template /tmp/temp.hbs 
+//!         gar query --where language:Rust --template /tmp/temp.hbs
 //!
 //!     Which should give you output like this:
 //!
@@ -163,6 +164,19 @@
 //!         The repo url is https://github.com/mozilla/rust
 //!         ======================================
 //!         ...
+//!
+//! Here are the labels you can use in your handlebars template:
+//!
+//! * id
+//! * name
+//! * description
+//! * language
+//! * has_issues
+//! * owner
+//! * url
+//! * watchers
+//! * stargazers
+//! * forks
 
 extern crate rustc_serialize;
 extern crate time;
