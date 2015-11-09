@@ -93,35 +93,48 @@
 //!
 //!     language:Rust,type:create
 //!
+//! Here's the list of things you can add as constraints:
+//!
 //! These are the event types you can capture using these labels:
 //!
-//! type:<event-type> where <event-type> is:
+//! * language:<value>, where value is the exact name of the language (case sensitive)
+//! * owner:<value>, where value is the exact name of the owner (case sensitive)
+//! * name:<regex-value>, where value is the (part) name of the repository (regex)
+//! * description:<regex-value>, where value is part of the comments, with a regex match
+//! * +watchers:<value>, where value is an integer. Matches against repos which have watchers more
+//! than or equal to the given value.
+//! * -watchers:<value>, where value is an integer. Matches against repositories which have less
+//! watchers than the value provided.
+//! * +stargazers:<value>,-stargazers:<value>, same as `watchers` above.
+//! * type:<event-type> where <event-type> is:
+//!     * create
+//!     * commit_comment
+//!     * delete
+//!     * deployment
+//!     * deployment_status
+//!     * download
+//!     * follow
+//!     * fork
+//!     * fork_apply
+//!     * gist
+//!     * gollum
+//!     * issue_comment
+//!     * issues
+//!     * member
+//!     * membership
+//!     * page_build
+//!     * public
+//!     * pull_request
+//!     * pull_request_review_comment
+//!     * push
+//!     * release
+//!     * repository
+//!     * status
+//!     * team_add
+//!     * watch
 //!
-//! * create
-//! * commit_comment
-//! * delete
-//! * deployment
-//! * deployment_status
-//! * download
-//! * follow
-//! * fork
-//! * fork_apply
-//! * gist
-//! * gollum
-//! * issue_comment
-//! * issues
-//! * member
-//! * membership
-//! * page_build
-//! * public
-//! * pull_request
-//! * pull_request_review_comment
-//! * push
-//! * release
-//! * repository
-//! * status
-//! * team_add
-//! * watch
+//! * commit_comment:<regex-value>, where value is the text to be matched, case insensitive against
+//! the given commits. This will only work against event types of `push`.
 //!
 //! # Handlebars
 //!
