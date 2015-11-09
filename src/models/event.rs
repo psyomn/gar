@@ -184,7 +184,7 @@ impl Event {
                 Ok(v)  => v,
                 Err(e) => {
                     ::print_red(format!("Could not parse anything given:\n{}", line).as_ref());
-                    println!("Err: {}", e);
+                    ::print_red(format!("Err: {}", e).as_ref());
                     continue;
                 },
             };
