@@ -5,72 +5,82 @@ It provides utilities to fetch specific archives, or fetch a range of archives v
 You can then run some semi-complex queries on the downloaded archives, which are still in gz
 format. Try running `help` to see information of each command, and subcommands.
 
-    gar 0.2.0
-    Simon psyomn Symeonidis <lethaljellybean@gmail.com>
-    Github Archive interfacing and querying tool
+````nocode
+gar 0.2.0
+Simon psyomn Symeonidis <lethaljellybean@gmail.com>
+Github Archive interfacing and querying tool
 
-    USAGE:
-    	gar [FLAGS] [SUBCOMMAND]
+USAGE:
+	gar [FLAGS] [SUBCOMMAND]
 
-    FLAGS:
-        -h, --help       Prints help information
-        -v, --version    show the current version
+FLAGS:
+    -h, --help       Prints help information
+    -v, --version    show the current version
 
-    SUBCOMMANDS:
-        fetch    for fetching singular files
-        help     Prints this message
-        query    for running queries on the retrieved data
-        show     for printing different program information
+SUBCOMMANDS:
+    fetch    for fetching singular files
+    help     Prints this message
+    query    for running queries on the retrieved data
+    show     for printing different program information
+````
 
 ## Fetching
 
 Let's take a look at simple fetching commands:
 
-    gar-fetch
-    for fetching singular files
+````nocode
+gar-fetch
+for fetching singular files
 
-    USAGE:
-    	gar fetch [FLAGS] [OPTIONS] [SUBCOMMAND]
+USAGE:
+	gar fetch [FLAGS] [OPTIONS] [SUBCOMMAND]
 
-    FLAGS:
-        -h, --help       Prints help information
-        -V, --version    Prints version information
+FLAGS:
+    -h, --help       Prints help information
+    -V, --version    Prints version information
 
-    OPTIONS:
-            --file <file>    the date in YYYY-mm-dd-h format
+OPTIONS:
+        --file <file>    the date in YYYY-mm-dd-h format
 
-    SUBCOMMANDS:
-        help     Prints this message
-        range    for fetching from certain dates
+SUBCOMMANDS:
+    help     Prints this message
+    range    for fetching from certain dates
+````
 
 You can fetch one file this way:
 
-    gar fetch --file 2014-1-1-1
+````nocode
+gar fetch --file 2014-1-1-1
+````
 
 Or if you want a specific range:
 
-    gar fetch range --from 2013-1-1-1 --to 2013-1-5-1
+````nocode
+gar fetch range --from 2013-1-1-1 --to 2013-1-5-1
+````
 
 ## Querying
 
 You can run simple queries this way:
 
-    gar-query
-    for running queries on the retrieved data
+````nocode
+gar-query
+for running queries on the retrieved data
 
-    USAGE:
-    	gar query [FLAGS] [OPTIONS]
+USAGE:
+	gar query [FLAGS] [OPTIONS]
 
-    FLAGS:
-        -h, --help       Prints help information
-        -V, --version    Prints version information
+FLAGS:
+    -h, --help       Prints help information
+    -V, --version    Prints version information
 
-    OPTIONS:
-        -f, --from <from>            specify query date in YYYY-mm-dd-h format
-        -s, --select <select>        specify which fields to output
-        -m, --template <template>    specify handlebar template for output
-        -t, --to <to>                specify query date in YYYY-mm-dd-h format
-        -w, --where <where>          specify selection constraints
+OPTIONS:
+    -f, --from <from>            specify query date in YYYY-mm-dd-h format
+    -s, --select <select>        specify which fields to output
+    -m, --template <template>    specify handlebar template for output
+    -t, --to <to>                specify query date in YYYY-mm-dd-h format
+    -w, --where <where>          specify selection constraints
+````
 
 Here is an example of a query:
 
@@ -97,16 +107,16 @@ Here's the list of things you can add as constraints:
 
 These are the event types you can capture using these labels:
 
-* language:<value>, where value is the exact name of the language (case sensitive)
-* owner:<value>, where value is the exact name of the owner (case sensitive)
-* name:<regex-value>, where value is the (part) name of the repository (regex)
-* description:<regex-value>, where value is part of the comments, with a regex match
-* +watchers:<value>, where value is an integer. Matches against repos which have watchers more
+* language:`value`, where value is the exact name of the language (case sensitive)
+* owner:`value`, where value is the exact name of the owner (case sensitive)
+* name:`regex-value`, where value is the (part) name of the repository (regex)
+* description:`regex-value`, where value is part of the comments, with a regex match
+* +watchers:`value`, where value is an integer. Matches against repos which have watchers more
 than or equal to the given value.
-* -watchers:<value>, where value is an integer. Matches against repositories which have less
+* -watchers:`value`, where value is an integer. Matches against repositories which have less
 watchers than the value provided.
-* +stargazers:<value>,-stargazers:<value>, same as `watchers` above.
-* type:<event-type> where <event-type> is:
+* +stargazers:`value`,-stargazers:`value`, same as `watchers` above.
+* type:`event-type` where `event-type` is:
     * create
     * commit_comment
     * delete
@@ -146,37 +156,39 @@ look for certain things in events, and get the information of that repo, by pipi
 
 Example:
 
-    Your handlebar template:
+````nocode
+Your handlebar template:
 
-        ==== Some entry ======================
-        The repo name is {{ name }}
-        The repo id is {{ id }}
-        The repo url is {{ url }}
-        ======================================
+    ==== Some entry ======================
+    The repo name is {{ name }}
+    The repo id is {{ id }}
+    The repo url is {{ url }}
+    ======================================
 
-    And your query should look like this:
+And your query should look like this:
 
-        gar query --where language:Rust --template /tmp/temp.hbs
+    gar query --where language:Rust --template /tmp/temp.hbs
 
-    Which should give you output like this:
+Which should give you output like this:
 
-        ...
-        ==== Some entry ======================
-        The repo name is rust
-        The repo id is 724712
-        The repo url is https://github.com/mozilla/rust
-        ======================================
-        ==== Some entry ======================
-        The repo name is rust
-        The repo id is 724712
-        The repo url is https://github.com/mozilla/rust
-        ======================================
-        ==== Some entry ======================
-        The repo name is rust
-        The repo id is 724712
-        The repo url is https://github.com/mozilla/rust
-        ======================================
-        ...
+    ...
+    ==== Some entry ======================
+    The repo name is rust
+    The repo id is 724712
+    The repo url is https://github.com/mozilla/rust
+    ======================================
+    ==== Some entry ======================
+    The repo name is rust
+    The repo id is 724712
+    The repo url is https://github.com/mozilla/rust
+    ======================================
+    ==== Some entry ======================
+    The repo name is rust
+    The repo id is 724712
+    The repo url is https://github.com/mozilla/rust
+    ======================================
+    ...
+````
 
 Here are the labels you can use in your handlebars template:
 
