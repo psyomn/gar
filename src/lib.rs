@@ -1,5 +1,3 @@
-#![feature(path_ext)]
-
 //! This is a small tool that helps you interface with githubarchive.org
 //! It provides utilities to fetch specific archives, or fetch a range of archives via date.
 //! You can then run some semi-complex queries on the downloaded archives, which are still in gz

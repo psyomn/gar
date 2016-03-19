@@ -5,7 +5,6 @@ use std::io::{Read, Write};
 
 use std::fs;
 use std::fs::File;
-use std::fs::PathExt;
 
 use std::env;
 use std::path::PathBuf;
