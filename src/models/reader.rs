@@ -26,10 +26,7 @@ pub fn deflate_to_contents(p: PathBuf) -> Option<String> {
     }
 
     let bb: &[u8] = bytes.as_ref();
-    let mut d = match GzDecoder::new(bb) {
-        Ok(v) => v,
-        Err(e) => panic!("Problem deflating: {}", e),
-    };
+    let mut d = GzDecoder::new(bb);
     let mut decomp: String = String::new();
 
     match d.read_to_string(&mut decomp) {
@@ -56,4 +53,3 @@ pub fn lines_of(p: PathBuf) -> Vec<String> {
         .map(|e| e.into())
         .collect()
 }
-

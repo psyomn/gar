@@ -1,18 +1,18 @@
 [package]
 authors = ["psyomn <lethaljellybean@gmail.com>"]
 name = "gar"
-version = "0.2.0"
+version = "0.3.0"
 
 [[bin]]
 doc = false
 name = "gar"
 
 [dependencies]
-chrono = "0.2.16"
-clap = "1.4.7"
-flate2 = "0.2.9"
-handlebars = "0.11.2"
-hyper = "0.6.15"
+chrono = "0.4.11"
+clap = "2.33.0"
+flate2 = "1.0.13"
+handlebars = "3.0.1"
+attohttpc = "0.13"
 regex = "0.1.41"
 rustc-serialize = "0.3.16"
 time = "0.1.33"

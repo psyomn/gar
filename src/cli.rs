@@ -1,4 +1,6 @@
 use chrono::*;
+use chrono::offset::Utc;
+
 use walkdir::WalkDir;
 use handlebars::{Handlebars};
 
@@ -18,8 +20,9 @@ pub fn version() -> () {
     println!("gar version {}", env!("CARGO_PKG_VERSION"));
 }
 
-/// Given a date in the format of "YYYY-m-d-h", parse the string into a DateTime<UTC> object
-fn parse_archive_date(date: String) -> Option<DateTime<UTC>> {
+/// Given a date in the format of "YYYY-m-d-h", parse the string into
+/// a DateTime<UTC> object
+fn parse_archive_date(date: String) -> Option<DateTime<Utc>> {
     let vals: Vec<&str> = date.split("-").collect::<Vec<&str>>();
 
     if vals.len() < 4 {
@@ -40,7 +43,7 @@ fn parse_archive_date(date: String) -> Option<DateTime<UTC>> {
 
     let mut it = vals.into_iter();
 
-    Some(UTC.ymd(
+    Some(Utc.ymd(
         try_int_parse(it.next()).unwrap() as i32,
         try_int_parse(it.next()).unwrap(),
         try_int_parse(it.next()).unwrap())
@@ -74,9 +77,7 @@ fn parse_archive(date: String) -> Option<Archive> {
 
 /// Same as fetch, but we're fetching a date range
 pub fn fetch_rng(from: Option<String>, to: Option<String>) -> () {
-    use time::Duration;
-
-    fn match_and_parse(o: Option<String>) -> Option<DateTime<UTC>> {
+    fn match_and_parse(o: Option<String>) -> Option<DateTime<Utc>> {
         match o {
             Some(v) => parse_archive_date(v),
             None => return None,
@@ -154,8 +155,10 @@ pub fn ls_data() -> () {
 /// Print the standard paths that the app uses.
 pub fn show_paths() -> () {
     let v = vec![config_path(), data_path(), config_file_path()];
-    v.into_iter().map(|e| ::print_green(format!("  {}\n", e.to_str().unwrap()).as_ref()))
-        .collect::<Vec<()>>();
+
+    v.into_iter()
+     .map(|e| ::print_green(format!("  {}\n", e.to_str().unwrap()).as_ref()))
+     .for_each(drop);
 }
 
 /// TODO: I'm not sure if this is supported anymore?
@@ -171,12 +174,13 @@ pub fn find_date(selects: Option<String>, wheres: Option<String>,
 ///   where <date> is YYYY-mm-dd-hh
 ///     and <constraints>+ is for example, language:Rust, name:potato
 pub fn find(from: Option<String>, to: Option<String>,
-            selects: Option<String>, wheres: Option<String>,
+            _selects: Option<String>, wheres: Option<String>,
             template: Option<String>) -> () {
-    let features: Vec<String> = match selects {
-        Some(s) => s.split(",").map(|e| e.to_string().clone()).collect(),
-        None => vec![],
-    };
+    // TODO:
+    // let features: Vec<String> = match selects {
+    //     Some(s) => s.split(",").map(|e| e.to_string().clone()).collect(),
+    //     None => vec![],
+    // };
 
     let constraints: Vec<String> = match wheres {
         Some(s) => s.split(",").map(|e| e.to_string().clone()).collect(),
@@ -241,14 +245,15 @@ pub fn find(from: Option<String>, to: Option<String>,
     }
 }
 
-/// This will look into the ~/.config/gar/data folder, and match the filenames against the given
-/// dates. If the match is successful, then the path to that archive is returned.
+/// This will look into the ~/.config/gar/data folder, and match the
+/// filenames against the given dates. If the match is successful,
+/// then the path to that archive is returned.
 fn choose_files_from_dates(from: Option<String>, to: Option<String>) -> Vec<PathBuf> {
     let v: Vec<PathBuf> = get_data_file_paths();
 
     #[inline]
-    fn date_from_path(p: &PathBuf) -> DateTime<UTC> {
-        let dt: DateTime<UTC> = UTC::now();
+    fn date_from_path(p: &PathBuf) -> DateTime<Utc> {
+        let dt: DateTime<Utc> = Utc::now();
         let filename = p.file_name();
 
         match filename {
@@ -270,8 +275,8 @@ fn choose_files_from_dates(from: Option<String>, to: Option<String>) -> Vec<Path
     }
 
     if from.is_some() && to.is_some() {
-        let from_date: DateTime<UTC> = parse_archive_date(from.unwrap()).unwrap();
-        let to_date: DateTime<UTC> = parse_archive_date(to.unwrap()).unwrap();
+        let from_date: DateTime<Utc> = parse_archive_date(from.unwrap()).unwrap();
+        let to_date: DateTime<Utc> = parse_archive_date(to.unwrap()).unwrap();
 
         v.into_iter()
          .filter(|e|{
@@ -281,14 +286,14 @@ fn choose_files_from_dates(from: Option<String>, to: Option<String>) -> Vec<Path
 
     }
     else if from.is_some() && to.is_none() {
-        let from_date: DateTime<UTC> = parse_archive_date(from.unwrap()).unwrap();
+        let from_date: DateTime<Utc> = parse_archive_date(from.unwrap()).unwrap();
 
         v.into_iter()
          .filter(|e| date_from_path(e) >= from_date)
          .collect()
     }
     else if from.is_none() && to.is_some() {
-        let to_date: DateTime<UTC> = parse_archive_date(to.unwrap()).unwrap();
+        let to_date: DateTime<Utc> = parse_archive_date(to.unwrap()).unwrap();
 
         v.into_iter()
          .filter(|e| date_from_path(e) <= to_date)

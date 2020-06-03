@@ -28,7 +28,7 @@ pub struct Event {
     forks: u64,
     open_issues: u64,
     event_type: Option<EventType>,
-    created_at: Option<DateTime<UTC>>,
+    created_at: Option<DateTime<Utc>>,
 }
 
 /// Models a repo event, in the file obtained from githubarchive.
@@ -63,7 +63,7 @@ impl Event {
         self.owner.set_email(e);
     }
 
-    pub fn set_created_at(&mut self, e: DateTime<UTC>) -> () {
+    pub fn set_created_at(&mut self, e: DateTime<Utc>) -> () {
         self.created_at = Some(e);
     }
 
@@ -204,12 +204,12 @@ impl Event {
 
         let obj = json.unwrap().as_object().unwrap();
 
-        let created_at: Option<DateTime<UTC>> = match obj.get("created_at") {
+        let created_at: Option<DateTime<Utc>> = match obj.get("created_at") {
             Some(v) => {
                 match *v {
                     Json::String(ref s) => {
                         let date_str: String = s.clone();
-                        match date_str.parse::<DateTime<UTC>>() {
+                        match date_str.parse::<DateTime<Utc>>() {
                             Ok(v) => Some(v),
                             Err(..) => None,
                         }
@@ -389,4 +389,3 @@ impl Event {
         map
     }
 }
-

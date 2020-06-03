@@ -1,21 +1,19 @@
 use chrono::*;
-use hyper::Client;
-use hyper::client::{Response};
-use hyper::header::Connection;
 
-use std::path::PathBuf;
 use std::fs::File;
-use std::io::{Read, Write};
+use std::path::PathBuf;
+
+use std::io::Write;
 
 use config;
 
-const GITHUT_ARCHIVE_URL: &'static str = "http://data.githubarchive.org/";
+const GITHUT_ARCHIVE_URL: &'static str = "https://data.githubarchive.org/";
 
 /// An archive is a file object - not to be confused with repos, or things that will give us access
 /// to data.
 #[derive(Debug)]
 pub struct Archive {
-    date: DateTime<UTC>,
+    date: DateTime<Utc>,
     data: Vec<u8>,
     name: String,
 }
@@ -30,7 +28,7 @@ pub struct ArchiveBuilder {
 impl Archive {
 
     pub fn new(y: i32, m: u32, d: u32, h: u32) -> Archive {
-        let d = UTC.ymd(y, m, d).and_hms(h, 0, 0);
+        let d = Utc.ymd(y, m, d).and_hms(h, 0, 0);
         let n = Archive::make_title(d);
 
         Archive {
@@ -40,12 +38,19 @@ impl Archive {
         }
     }
 
-    fn make_date(d: DateTime<UTC>) -> String {
+    fn make_date(d: DateTime<Utc>) -> String {
         d.format("%Y-%m-%d-%-k").to_string()
     }
 
-    fn make_title(d: DateTime<UTC>) -> String {
+    fn make_title(d: DateTime<Utc>) -> String {
         format!("{}.json.gz", Archive::make_date(d))
+    }
+
+    fn fetch_raw(url: &String) -> Vec<u8> {
+        match attohttpc::get(&url).send() {
+            Ok(raw) => raw.bytes().unwrap(),
+            Err(e) => panic!(e),
+        }
     }
 
     /// Fetch the information of a specific archive. This will return something in memory, and will
@@ -59,22 +64,8 @@ impl Archive {
         }
 
         let url: String = format!("{}{}", GITHUT_ARCHIVE_URL, title);
-        let url_ref: &str = url.as_ref();
 
-        let client: Client = Client::new();
-        let mut resp: Response = client.get(url_ref)
-            .header(Connection::close())
-            .send().unwrap();
-
-        let mut data: Vec<u8> = vec![];
-
-        print!("Fetching {}", url_ref);
-        match resp.read_to_end(&mut data) {
-            Err(e) => { println!("{}", e); panic!(e)},
-            _ => {},
-        }
-
-        self.data = data;
+        self.data = Archive::fetch_raw(&url);
 
         if &self.data[0..5] == b"<?xml" {
             ::print_magenta(format!("\nNo such info found on server ({})\n", url).as_ref());
@@ -110,23 +101,23 @@ impl Archive {
 
     /// Set the year of the archive we're interested in
     pub fn set_year(&mut self, year: i32) -> () {
-        self.date = UTC.ymd(year, self.date.month(), self.date.day())
+        self.date = Utc.ymd(year, self.date.month(), self.date.day())
                        .and_hms(9, 0, 0);
     }
 
     /// Set the month of the archive we're interested in
     pub fn set_month(&mut self, month: u32) -> () {
-        self.date = UTC.ymd(self.date.year(), month, self.date.day()).and_hms(9, 0, 0);
+        self.date = Utc.ymd(self.date.year(), month, self.date.day()).and_hms(9, 0, 0);
     }
 
     /// Set the day of the archive we're interested in
     pub fn set_day(&mut self, day: u32) -> () {
-        self.date = UTC.ymd(self.date.year(), self.date.month(), day).and_hms(9, 0, 0);
+        self.date = Utc.ymd(self.date.year(), self.date.month(), day).and_hms(9, 0, 0);
     }
 
     /// Set the hour of the archive we're interested in
     pub fn set_hour(&mut self, h: u32) -> () {
-        self.date = UTC.ymd(self.date.year(), self.date.month(), self.date.day()).and_hms(h, 0, 0);
+        self.date = Utc.ymd(self.date.year(), self.date.month(), self.date.day()).and_hms(h, 0, 0);
     }
 }
 
@@ -168,4 +159,3 @@ impl ArchiveBuilder {
             self.hour)
     }
 }
-
