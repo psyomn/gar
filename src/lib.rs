@@ -82,24 +82,24 @@
 //!
 //! Here is an example of a query:
 //!
-//!     gar query --where language:Rust,type:create
+//!   gar query --where language:Rust,type:create
 //!
 //! This will search for all events, and select only the events where the repository is of the Rust
 //! language, and the type of event is a CreateEvent. You can also specify time constraints with to
 //! and from:
 //!
-//!     gar query --where language:Rust,type:create --from 2013-1-1-1 --to 2013-1-5-1
+//!   gar query --where language:Rust,type:create --from 2013-1-1-1 --to 2013-1-5-1
 //!
 //! And as you noticed you can also provide a type of event, and language using the `--where` clause.
 //! The way you do this, is by providing a label, delimited with a colon `:` and provide the value.
 //! For example:
 //!
-//!     language:Rust
+//!  language:Rust
 //!
 //! Satisfies this query. You can add more constraints by delimiting them with a comma ','. The
 //! relevance of a comma in this case is as if it's a logical `AND`. As you previously saw:
 //!
-//!     language:Rust,type:create
+//!   language:Rust,type:create
 //!
 //! Here's the list of things you can add as constraints:
 //!
@@ -258,8 +258,6 @@ fn vec_contains<T: PartialEq>(v: &Vec<T>, t: &T) -> bool {
 
 #[cfg(test)]
 mod test {
-    use super::*;
-
     #[test]
     fn test_vec_contains() -> () {
         let vs: Vec<String> = vec!["potato".into(), "yotato".into(), "motato".into()];
