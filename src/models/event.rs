@@ -183,8 +183,10 @@ impl Event {
             let json_line: Json = match Json::from_str(line.as_ref()) {
                 Ok(v)  => v,
                 Err(e) => {
-                    ::print_red(format!("Could not parse anything given:\n{}", line).as_ref());
-                    ::print_red(format!("Err: {}", e).as_ref());
+                    // TODO cleanup
+                    println!("Could not parse anything given:\n{}", line);
+                    println!("Err: {}", e);
+
                     continue;
                 },
             };

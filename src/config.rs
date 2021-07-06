@@ -17,11 +17,9 @@ const CONFIG: &'static str = "gar.toml";
 pub fn config_path() -> PathBuf {
     let home = match env::var("HOME") {
         Ok(v) => v,
-        Err(e) => {
-            println!("Could not get the HOME environment variable");
-            panic!(e);
-        },
+        Err(e) => panic!("could not get the HOME environment variable: {}", e),
     };
+
     let mut path = PathBuf::new();
     path.push(home);
     path.push(PREFIX);
@@ -44,7 +42,7 @@ pub fn config_file_path() -> PathBuf {
 fn read_configuration_file() -> Table {
     let mut f: File = match File::open(config_file_path()) {
         Ok(v) => v,
-        Err(e) => panic!(e),
+        Err(e) => panic!("{}", e),
     };
     let mut s: String = String::new();
     f.read_to_string(&mut s).unwrap();
@@ -84,16 +82,18 @@ pub fn data_exists(filename: &String) -> bool {
 /// Default things to run each time we go through the main entry point.
 pub fn init() -> () {
     let cpath: PathBuf = config_path();
+    let cpath_str = cpath.to_string_lossy();
     let dpath: PathBuf = data_path();
+    let dpath_str = dpath.to_string_lossy();
     let config_file: PathBuf = config_file_path();
 
     if !cpath.exists() {
-        println!("Config file path created for the first time");
+        println!("config file path created for the first time: {}", cpath_str);
         fs::create_dir_all(cpath.to_str().unwrap()).unwrap();
     }
 
     if !dpath.exists() {
-        println!("Data path created for the first time");
+        println!("data path created for the first time: {}", dpath_str);
         fs::create_dir_all(dpath.to_str().unwrap()).unwrap();
     }
 
@@ -108,12 +108,10 @@ pub fn init() -> () {
 
         let mut f: File = match File::create(config_file) {
             Ok(v)  => v,
-            Err(e) => panic!("Could not open config file for writing {}", e),
+            Err(e) => panic!("could not open config file for writing {}", e),
         };
 
-        println!("Writing configuration for the first time");
+        println!("writing configuration for the first time");
         f.write_all(s.as_bytes()).unwrap();
     }
 }
-
-

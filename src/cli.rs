@@ -111,7 +111,7 @@ pub fn fetch_rng(from: Option<String>, to: Option<String>) -> () {
     }
 
     for date in date_strings {
-        fetch(date);
+        fetch(date)
     }
 }
 
@@ -121,7 +121,13 @@ pub fn fetch(s: String) -> () {
         Some(a) => a,
         None => panic!("Could not fetch archive"),
     };
-    archive.fetch();
+
+    print!("fetch {} ... ", archive);
+
+    match archive.fetch() {
+        Ok(status) => println!("ok: {}", status),
+        Err(status) => println!("error: {}", status),
+    }
 }
 
 pub fn ls_data() -> () {
@@ -154,11 +160,9 @@ pub fn ls_data() -> () {
 
 /// Print the standard paths that the app uses.
 pub fn show_paths() -> () {
-    let v = vec![config_path(), data_path(), config_file_path()];
-
-    v.into_iter()
-     .map(|e| ::print_green(format!("  {}\n", e.to_str().unwrap()).as_ref()))
-     .for_each(drop);
+    for e in vec![config_path(), data_path(), config_file_path()].iter() {
+        println!("{}", e.to_string_lossy());
+    }
 }
 
 /// TODO: I'm not sure if this is supported anymore?

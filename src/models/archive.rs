@@ -1,16 +1,40 @@
 use chrono::*;
 
 use std::fs::File;
+use std::fmt;
 use std::path::PathBuf;
 
 use std::io::Write;
 
 use config;
 
-const GITHUT_ARCHIVE_URL: &'static str = "https://data.githubarchive.org/";
+const GITHUT_ARCHIVE_URL: &str = "https://data.githubarchive.org/";
 
-/// An archive is a file object - not to be confused with repos, or things that will give us access
-/// to data.
+// TODO might be worth to break into FetchErrors and FetchOks
+pub enum FetchStatus {
+    Success,
+    Cached,
+    FailFetch,
+    NotFound,
+    CantCreateCacheFile,
+    CantWriteCacheFile,
+    ResourceUnavailable,
+}
+
+impl fmt::Display for FetchStatus {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            FetchStatus::Success => write!(f, "success"),
+            FetchStatus::Cached => write!(f, "cached"),
+            FetchStatus::FailFetch => write!(f, "failed to fetch"),
+            FetchStatus::NotFound => write!(f, "not found"),
+            FetchStatus::CantCreateCacheFile => write!(f, "cant create cache file"),
+            FetchStatus::CantWriteCacheFile => write!(f, "cant write cache file"),
+            FetchStatus::ResourceUnavailable => write!(f, "resource unavailable"),
+        }
+    }
+}
+
 #[derive(Debug)]
 pub struct Archive {
     date: DateTime<Utc>,
@@ -22,13 +46,12 @@ pub struct ArchiveBuilder {
     year: i32,
     month: u32,
     day: u32,
-    hour: u32
+    hour: u32,
 }
 
 impl Archive {
-
-    pub fn new(y: i32, m: u32, d: u32, h: u32) -> Archive {
-        let d = Utc.ymd(y, m, d).and_hms(h, 0, 0);
+    pub fn new(year: i32, month: u32, day: u32, hour: u32) -> Archive {
+        let d = Utc.ymd(year, month, day).and_hms(hour, 0, 0);
         let n = Archive::make_title(d);
 
         Archive {
@@ -46,78 +69,81 @@ impl Archive {
         format!("{}.json.gz", Archive::make_date(d))
     }
 
-    fn fetch_raw(url: &String) -> Vec<u8> {
-        match attohttpc::get(&url).send() {
-            Ok(raw) => raw.bytes().unwrap(),
-            Err(e) => panic!(e),
+    fn fetch_raw(url: &String) -> Result<Vec<u8>, FetchStatus> {
+        let response = match attohttpc::get(&url).send() {
+            Ok(v) => v,
+            Err(_) => return Err(FetchStatus::FailFetch),
+        };
+
+        if !response.is_success() {
+            // TODO: may be more cases here, but this will have to do
+            //   for now. Apparently attohttpc actually uses hyperium,
+            //   or some parts of it
+            return Err(FetchStatus::NotFound);
+        }
+
+        match response.bytes() {
+            Ok(bytes) => Ok(bytes),
+            Err(_) => Err(FetchStatus::ResourceUnavailable),
         }
     }
 
-    /// Fetch the information of a specific archive. This will return something in memory, and will
-    /// not make a local copy.
-    pub fn fetch(&mut self) -> () {
+    pub fn fetch(&mut self) -> Result<FetchStatus, FetchStatus> {
         let title: String = Archive::make_title(self.date);
 
         if config::data_exists(&title) {
-            ::print_yellow(format!("Data {} exists in cache - skip\n", title).as_ref());
-            return;
+            return Ok(FetchStatus::Cached)
         }
 
         let url: String = format!("{}{}", GITHUT_ARCHIVE_URL, title);
 
-        self.data = Archive::fetch_raw(&url);
-
-        if &self.data[0..5] == b"<?xml" {
-            ::print_magenta(format!("\nNo such info found on server ({})\n", url).as_ref());
-            return;
-        }
-        else {
-            ::print_green(format!(" ok\n").as_ref());
+        match Archive::fetch_raw(&url) {
+            Ok(value) => self.data = value,
+            Err(_) => return Err(FetchStatus::FailFetch),
         }
 
-        if config::caching_on() { self.store() }
+        if config::caching_on() { return self.store() }
+
+        Ok(FetchStatus::Success)
     }
 
-    pub fn store(&self) -> () {
+    pub fn store(&self) -> Result<FetchStatus, FetchStatus> {
         let mut base: PathBuf = config::data_path();
-        let s: String = match base.clone().to_str() {
-            Some(v) => v.to_string(),
-            None => return,
-        };
 
         base.push(self.name.clone());
 
         let mut f: File = match File::create(base) {
             Ok(v) => v,
-            Err(e) => {
-                println!("Problem opening caching file @ {:?}", s);
-                println!("{}", e);
-                return;
-            },
+            Err(_) => return Err(FetchStatus::CantCreateCacheFile),
         };
 
-        f.write_all(&self.data).unwrap();
+        match f.write_all(&self.data) {
+            Ok(_) => Ok(FetchStatus::Success),
+            Err(_) => Err(FetchStatus::CantWriteCacheFile),
+        }
     }
 
-    /// Set the year of the archive we're interested in
     pub fn set_year(&mut self, year: i32) -> () {
         self.date = Utc.ymd(year, self.date.month(), self.date.day())
                        .and_hms(9, 0, 0);
     }
 
-    /// Set the month of the archive we're interested in
     pub fn set_month(&mut self, month: u32) -> () {
         self.date = Utc.ymd(self.date.year(), month, self.date.day()).and_hms(9, 0, 0);
     }
 
-    /// Set the day of the archive we're interested in
     pub fn set_day(&mut self, day: u32) -> () {
         self.date = Utc.ymd(self.date.year(), self.date.month(), day).and_hms(9, 0, 0);
     }
 
-    /// Set the hour of the archive we're interested in
     pub fn set_hour(&mut self, h: u32) -> () {
         self.date = Utc.ymd(self.date.year(), self.date.month(), self.date.day()).and_hms(h, 0, 0);
+    }
+}
+
+impl fmt::Display for Archive {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}", Archive::make_date(self.date))
     }
 }
 
