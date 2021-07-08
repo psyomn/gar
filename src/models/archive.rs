@@ -107,6 +107,10 @@ impl Archive {
         Ok(FetchStatus::Success)
     }
 
+    pub fn get_name(&self) -> String {
+        self.name.clone()
+    }
+
     pub fn store(&self) -> Result<FetchStatus, FetchStatus> {
         let mut base: PathBuf = config::data_path();
 

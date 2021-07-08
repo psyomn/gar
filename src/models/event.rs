@@ -31,17 +31,16 @@ pub struct Event {
     created_at: Option<DateTime<Utc>>,
 }
 
-/// Models a repo event, in the file obtained from githubarchive.
-impl Event {
-    pub fn new() -> Event {
-        Event {
+impl Default for Event {
+    fn default() -> Self {
+        Event{
             gh_id: 0,
-            name: "default".into(),
-            language: "default".into(),
-            description: "default".into(),
+            name: "".into(),
+            language: "".into(),
+            description: "".into(),
             has_issues: false,
             owner: owner::OwnerBuilder::new().finalize(),
-            url: "default".into(),
+            url: "".into(),
             watchers: 0,
             stargazers: 0,
             forks: 0,
@@ -50,6 +49,16 @@ impl Event {
             created_at: None,
         }
     }
+}
+
+/// Models a repo event, in the file obtained from githubarchive.
+impl Event {
+    pub fn new() -> Event { Default::default() }
+
+    pub fn get_gh_id(&self) -> u64 { self.gh_id }
+    pub fn get_name(&self) -> &String { &self.name }
+    pub fn get_description(&self) -> &String { &self.description }
+    pub fn get_language(&self) -> &String { &self.language }
 
     pub fn set_owner_gh_id(&mut self, id: u64) -> () {
         self.owner.set_gh_id(id);
