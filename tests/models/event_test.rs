@@ -8,7 +8,6 @@ fn default_test() {
 
     assert_eq!(0, event.get_gh_id());
     assert_eq!("", event.get_name());
-    assert_eq!("", event.get_description());
 }
 
 #[test]
@@ -49,5 +48,5 @@ fn json_object_parsing_test() {
 
     let event_result = Event::into_json_object(&json_string).unwrap();
 
-    println!("{:?}", event_result);
+    assert_eq!(325897057, event_result.get_gh_id());
 }

@@ -225,29 +225,3 @@ extern crate handlebars;
 pub mod models;
 pub mod config;
 pub mod cli;
-
-fn vec_contains<T: PartialEq>(v: &Vec<T>, t: &T) -> bool {
-    for e in v {
-        if e == t { return true }
-    }
-    false
-}
-
-#[cfg(test)]
-mod test {
-    #[test]
-    fn test_vec_contains() -> () {
-        let vs: Vec<String> = vec!["potato".into(), "yotato".into(), "motato".into()];
-        let vu32: Vec<u32> = vec![1,2,3,4,5,6];
-        let vi32: Vec<i32> = vec![1,2,3,4,5];
-        let jon: String = "jon".into();
-
-        assert!(::vec_contains::<String>(&vs, &"potato".into()));
-        assert!(::vec_contains::<u32>(&vu32, &2));
-        assert!(::vec_contains::<i32>(&vi32, &5));
-
-        assert!(!::vec_contains::<i32>(&vi32, &122));
-        assert!(!::vec_contains::<u32>(&vu32, &123123));
-        assert!(!::vec_contains::<String>(&vs, &jon));
-    }
-}
