@@ -1,6 +1,6 @@
 use rustc_serialize::json::*;
 
-#[derive(Debug)]
+#[derive(Debug,Eq,PartialEq)]
 pub struct ShaElement {
     sha: String,
     email: String,
@@ -62,4 +62,3 @@ impl ShaElement {
         &self.comment
     }
 }
-

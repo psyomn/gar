@@ -2,7 +2,7 @@ use rustc_serialize::json::Json;
 use models::json_helpers::JsonHelper;
 
 /// This is one of the elements found within the GollumEvent payload
-#[derive(Debug)]
+#[derive(Debug,Eq,PartialEq)]
 pub struct PageElement {
     action: String,
     html_url: String,

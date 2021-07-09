@@ -1,3 +1,4 @@
+use std::io::ErrorKind;
 use std::collections::BTreeMap;
 use std::path::PathBuf;
 
@@ -14,11 +15,12 @@ use models::payloads::*;
 
 use chrono::*;
 
+// TODO: this should have an enumerated struct, because not all the
+//   events have the same fields.
 #[derive(Debug)]
 pub struct Event {
     gh_id: u64,
     name: String,
-    description: String,
     language: String,
     has_issues: bool,
     owner: owner::Owner,
@@ -37,7 +39,6 @@ impl Default for Event {
             gh_id: 0,
             name: "".into(),
             language: "".into(),
-            description: "".into(),
             has_issues: false,
             owner: owner::OwnerBuilder::new().finalize(),
             url: "".into(),
@@ -57,7 +58,6 @@ impl Event {
 
     pub fn get_gh_id(&self) -> u64 { self.gh_id }
     pub fn get_name(&self) -> &String { &self.name }
-    pub fn get_description(&self) -> &String { &self.description }
     pub fn get_language(&self) -> &String { &self.language }
 
     pub fn set_owner_gh_id(&mut self, id: u64) -> () {
@@ -96,12 +96,7 @@ impl Event {
                 let re: Regex = Regex::new(re_str.as_ref()).unwrap();
                 b &= re.is_match(self.name.as_ref());
             }
-            if cons.label == "description" {
-                /* This does a wor dmatch against the description given to the event's repo */
-                let re_str: String = format!("(?i){}", cons.value);
-                let re: Regex = Regex::new(re_str.as_ref()).unwrap();
-                b &= re.is_match(self.description.as_ref());
-            }
+            // TODO: maybe make the payload description searchable
             if cons.label == "+watchers" {
                 /* TODO: parsing to int each time - this might not be good? */
                 let num: u64 = cons.value.parse::<u64>().ok().unwrap();
@@ -128,6 +123,9 @@ impl Event {
                     None => continue,
                 };
 
+                // TODO: there should bea better way to do this --
+                // probably can convert the constraint into the enum
+                // and make the comparison like this
                 b &= match cons.value.as_ref() {
                     "create"                      => match etype { &EventType::Create                   => true, _ => false },
                     "commit_comment"              => match etype { &EventType::CommitComment            => true, _ => false },
@@ -182,40 +180,60 @@ impl Event {
         b
     }
 
-    /// Given a path to a json.gz file, that file is read, and each line is parsed to a Event
-    /// object.
+    /// Given a path to a json.gz file, that file is read, and each
+    /// line is parsed to a Event object.
     pub fn from_path(p: PathBuf) -> Vec<Event> {
         let v: Vec<String> = lines_of(p);
         let mut res: Vec<Event> = Vec::new();
 
+
         for line in v.into_iter() {
-            let json_line: Json = match Json::from_str(line.as_ref()) {
-                Ok(v)  => v,
-                Err(e) => {
-                    // TODO cleanup
-                    println!("Could not parse anything given:\n{}", line);
-                    println!("Err: {}", e);
-
-                    continue;
-                },
+            let obj = match Event::into_json_object(&line) {
+                Ok(v) => v,
+                Err(..) => continue, // TODO: logging should be good here
             };
 
-            if let Some(v) = Event::from_json(Some(&json_line)) {
-                res.push(v);
-            };
+            res.push(obj);
         }
 
         res
     }
 
+    pub fn into_json_object(line: &str) -> std::io::Result<Event> {
+        // cleanup stdio::Error
+
+        let json_line: Json = match Json::from_str(line) {
+            Ok(v)  => v,
+            Err(e) => {
+                // TODO cleanup
+                println!("Could not parse anything given:\n{}", line);
+                println!("Err: {}", e);
+                return Err(std::io::Error::new(ErrorKind::InvalidInput, "invalid json"))
+            },
+        };
+
+        match Event::from_json(&json_line) {
+            Some(v) => Ok(v),
+            None => {
+                return Err(std::io::Error::new(ErrorKind::InvalidInput, "bad json structure"))
+            },
+        }
+    }
+
     /// Given a json string, try to evaluate it into a repo
-    pub fn from_json(json: Option<&Json>) -> Option<Event> {
-        if json.is_none() { return None }
-        if !json.unwrap().is_object() { return None }
+    pub fn from_json(json: &Json) -> Option<Event> {
+        const KEY_CREATED_AT: &str = "created_at";
+        const KEY_REPOSITORY: &str = "repo";
+        const KEY_TYPE: &str = "type";
+        // I'm adding the above as constants; some of the keys changed
+        // in the json over the years, and we should have one source of
+        // truth.
 
-        let obj = json.unwrap().as_object().unwrap();
+        if !json.is_object() { return None }
 
-        let created_at: Option<DateTime<Utc>> = match obj.get("created_at") {
+        let obj = json.as_object().unwrap();
+
+        let created_at: Option<DateTime<Utc>> = match obj.get(KEY_CREATED_AT) {
             Some(v) => {
                 match *v {
                     Json::String(ref s) => {
@@ -231,52 +249,35 @@ impl Event {
             None => None
         };
 
-        let repo = match obj.get("repository") {
-            None => return None,
-            Some(v) => v.as_object().unwrap(),
-        };
+        let payload_obj = obj.get("payload");
 
-        let event: Option<EventType> = match obj.get("type") {
+        let event: Option<EventType> = match obj.get(KEY_TYPE) {
             None => None,
             Some(v) => match *v {
                 Json::String(ref s) => {
-                    match s.as_ref() {
-                        "CreateEvent"                   => Some(EventType::Create),
-                        "CommitCommentEvent"            => Some(EventType::CommitComment),
-                        "DeleteEvent"                   => Some(EventType::Delete(DeletePayload::from_json(obj.get("payload")))),
-                        "DeploymentEvent"               => Some(EventType::Deployment),
-                        "DeploymentStatusEvent"         => Some(EventType::DeploymentStatus),
-                        "DownloadEvent"                 => Some(EventType::Download),
-                        "FollowEvent"                   => Some(EventType::Follow),
-                        "ForkEvent"                     => Some(EventType::Fork),
-                        "ForkApplyEvent"                => Some(EventType::ForkApply),
-                        "GistEvent"                     => Some(EventType::Gist),
-                        "GollumEvent"                   => Some(EventType::Gollum(GollumPayload::from_json(obj.get("payload")))),
-                        "IssueCommentEvent"             => Some(EventType::IssueComment(IssueCommentPayload::from_json(obj.get("payload")))),
-                        "IssuesEvent"                   => Some(EventType::Issues(IssuePayload::from_json(obj.get("payload")))),
-                        "MemberEvent"                   => Some(EventType::Member),
-                        "MembershipEvent"               => Some(EventType::Membership),
-                        "PageBuildEvent"                => Some(EventType::PageBuild),
-                        "PublicEvent"                   => Some(EventType::Public),
-                        "PullRequestEvent"              => Some(EventType::PullRequest),
-                        "PullRequestReviewCommentEvent" => Some(EventType::PullRequestReviewComment),
-                        "PushEvent"                     => Some(EventType::Push(PushPayload::from_json(obj.get("payload")))),
-                        "ReleaseEvent"                  => Some(EventType::Release),
-                        "RepositoryEvent"               => Some(EventType::Repository),
-                        "StatusEvent"                   => Some(EventType::Status),
-                        "TeamAddEvent"                  => Some(EventType::TeamAdd),
-                        "WatchEvent"                    => Some(EventType::Watch(WatchPayload::from_json(obj.get("payload")))),
-                        _                               => None,
+                    match s.parse::<EventType>().unwrap() {
+                        EventType::Unknown(..) => None, // preserve Unknown in the future
+                        EventType::Delete(..) => Some(EventType::Delete(DeletePayload::from_json(payload_obj))),
+                        EventType::Gollum(..) => Some(EventType::Gollum(GollumPayload::from_json(payload_obj))),
+                        EventType::IssueComment(..) => Some(EventType::IssueComment(IssueCommentPayload::from_json(payload_obj))),
+                        EventType::Issues(..) => Some(EventType::Issues(IssuePayload::from_json(payload_obj))),
+                        EventType::Push(..) => Some(EventType::Push(PushPayload::from_json(payload_obj))),
+                        EventType::Watch(..) => Some(EventType::Watch(WatchPayload::from_json(payload_obj))),
+                        simple_event => Some(simple_event),
                     }
                 },
                 _ => None,
             },
         };
 
+        let repo = match obj.get(KEY_REPOSITORY) {
+            None => return None,
+            Some(v) => v.as_object().unwrap(),
+        };
+
         let gh_id = JsonHelper::number_or_zero(repo.get("id"));
         let name: String = JsonHelper::string_or_empty(repo.get("name"));
         let url: String = JsonHelper::string_or_empty(repo.get("url"));
-        let desc: String = JsonHelper::string_or_empty(repo.get("description"));
         let owner_name: String = JsonHelper::string_or_empty(repo.get("owner"));
         let issues_present: bool = JsonHelper::boolean_or_false(repo.get("has_issues"));
         let language: String = JsonHelper::string_or_empty(repo.get("language"));
@@ -291,7 +292,6 @@ impl Event {
 
         repo.gh_id = gh_id;
         repo.url = url;
-        repo.description = desc;
         repo.name = name;
         repo.has_issues = issues_present;
         repo.language = language;
@@ -311,7 +311,6 @@ impl Event {
 
         let id_label: String = "id".into();
         let name_label: String = "name".into();
-        let desc: String = "description".into();
         let lang: String = "language".into();
         let has_issues: String = "has_issues".into();
         let owner: String = "owner".into();
@@ -328,9 +327,6 @@ impl Event {
         }
         if ::vec_contains(&f, &name_label) {
             map.insert(name_label, self.name.clone());
-        }
-        if ::vec_contains(&f, &desc) {
-            map.insert(desc, self.description.clone());
         }
         if ::vec_contains(&f, &lang) {
             map.insert(lang, self.language.clone());
@@ -381,7 +377,6 @@ impl Event {
 
         map.insert("id".into(), self.gh_id.to_string());
         map.insert("name".into(), self.name.clone());
-        map.insert("description".into(), self.description.clone());
         map.insert("language".into(), self.language.clone());
         map.insert("has_issues".into(), self.has_issues.to_string());
         map.insert("owner".into(), self.owner.get_nick().clone());

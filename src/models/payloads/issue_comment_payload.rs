@@ -1,7 +1,7 @@
 use rustc_serialize::json::Json;
 use models::json_helpers::JsonHelper;
 
-#[derive(Debug)]
+#[derive(Debug,Eq,PartialEq)]
 pub struct IssueCommentPayload {
     comment_id: u64,
     issue_id: u64,

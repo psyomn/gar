@@ -1,6 +1,6 @@
 use rustc_serialize::json::Json;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 pub struct DeletePayload {
     ref_tag: String,
     ref_tag_type: String,

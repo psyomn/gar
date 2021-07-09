@@ -1,7 +1,7 @@
 use models::json_helpers::JsonHelper;
 use rustc_serialize::json::*;
 
-#[derive(Debug)]
+#[derive(Debug,Eq,PartialEq)]
 pub struct WatchPayload {
     action: String,
 }

@@ -1,7 +1,7 @@
 use rustc_serialize::json::Json;
 use models::payloads::page_element::PageElement;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct GollumPayload {
     pages: Vec<PageElement>,
 }

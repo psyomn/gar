@@ -1,6 +1,6 @@
 use rustc_serialize::json::*;
 
-#[derive(Debug)]
+#[derive(Debug,PartialEq,Eq)]
 pub struct IssuePayload {
     action: String,
     issue: u64,

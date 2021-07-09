@@ -1,12 +1,10 @@
-use std::io;
-use std::io::{Read, Write};
+use std::io::{Read};
 use std::path::PathBuf;
 use std::fs::File;
 use flate2::read::GzDecoder;
 
 /// Given a path to the json.gz file,
 pub fn deflate_to_contents(p: PathBuf) -> Option<String> {
-    let mut stderr = io::stderr();
     let pp: PathBuf = p.clone();
     let ppstring: &str = pp.to_str().unwrap_or("[uncapable of unwraping]");
 
@@ -20,7 +18,7 @@ pub fn deflate_to_contents(p: PathBuf) -> Option<String> {
     match f.read_to_end(&mut bytes) {
         Ok(..) => {},
         Err(e) => {
-            writeln!(&mut stderr, "Problem loading file: {}", e).unwrap();
+            println!("Problem loading file: {}", e);
             return None;
         },
     }
@@ -31,9 +29,8 @@ pub fn deflate_to_contents(p: PathBuf) -> Option<String> {
 
     match d.read_to_string(&mut decomp) {
         Err(e) => {
-            writeln!(&mut stderr,
-                     "Problem reading archive to string from error {}; archive was {}",
-                     e, ppstring).unwrap();
+            println!("Problem reading archive to string from error {}; archive was {}",
+                     e, ppstring);
             return None;
         },
         Ok(..) => {},

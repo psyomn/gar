@@ -1,6 +1,8 @@
+use std::str::FromStr;
+
 use models::payloads::*;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum EventType {
     Create,
     Fork,
@@ -28,6 +30,7 @@ pub enum EventType {
     Status,
     TeamAdd,
     Watch(Option<WatchPayload>),
+    Unknown(String),
 }
 
 impl ToString for EventType {
@@ -59,6 +62,44 @@ impl ToString for EventType {
             EventType::Status => "StatusEvent".into(),
             EventType::TeamAdd => "TeamAddEvent".into(),
             EventType::Watch(..) => "WatchEvent".into(),
+            EventType::Unknown(ref val) => format!("Unknown({})", val),
         }
+    }
+}
+
+impl FromStr for EventType {
+    type Err = std::convert::Infallible;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let ret = match s {
+            "CreateEvent" => EventType::Create,
+            "CommitCommentEvent" => EventType::CommitComment,
+            "DeleteEvent" => EventType::Delete(None),
+            "DeploymentEvent" => EventType::Deployment,
+            "DeploymentStatusEvent" => EventType::DeploymentStatus,
+            "DownloadEvent" => EventType::Download,
+            "FollowEvent" => EventType::Follow,
+            "ForkEvent" => EventType::Fork,
+            "ForkApplyEvent" => EventType::ForkApply,
+            "GistEvent" => EventType::Gist,
+            "GollumEvent" => EventType::Gollum(None),
+            "IssueCommentEvent" => EventType::IssueComment(None),
+            "IssuesEvent" => EventType::Issues(None),
+            "MemberEvent" => EventType::Member,
+            "MemebershipEvent" => EventType::Membership,
+            "PageBuildEvent" => EventType::PageBuild,
+            "PublicEvent" => EventType::Public,
+            "PullRequestEvent" => EventType::PullRequest,
+            "PullRequestReviewCommentEvent" => EventType::PullRequestReviewComment,
+            "PushEvent" => EventType::Push(None),
+            "ReleaseEvent" => EventType::Release,
+            "RepositoryEvent" => EventType::Repository,
+            "StatusEvent" => EventType::Status,
+            "TeamAddEvent" => EventType::TeamAdd,
+            "WatchEvent" => EventType::Watch(None),
+            _ => EventType::Unknown(s.into()),
+        };
+
+        Ok(ret)
     }
 }

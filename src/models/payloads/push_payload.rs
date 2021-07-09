@@ -4,7 +4,7 @@ use rustc_serialize::json::Json;
 use models::payloads::ShaElement;
 use models::json_helpers::JsonHelper;
 
-#[derive(Debug)]
+#[derive(Debug,Eq,PartialEq)]
 pub struct PushPayload {
     head: String, /* sha hash */
     refs: String, /* eg: refs/head/master */
@@ -60,4 +60,3 @@ impl PushPayload {
             .fold(false, |e,sum| sum || e)
     }
 }
-
